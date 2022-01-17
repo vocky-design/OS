@@ -1,6 +1,6 @@
 bochs/bin/*
 bochs/share/*
-
+bochs/hd60M.img
 *.lst
 *.bin
 *.o
