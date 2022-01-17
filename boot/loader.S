@@ -17,9 +17,9 @@ section loader vstart=LOADER_BASE_ADDR
 
 	total_mem_bytes dd 0		;这块地址是0xb00,0x900+(60+4)*8=0xb00
 
-	SELECTOR_CODE 	equ (0x01<<3) + TI_GDT + RPL0
-	SELECTOR_DATA 	equ (0x02<<3) + TI_GDT + RPL0
-	SELECTOR_VIDEO	equ (0x03<<3) + TI_GDT + RPL0
+	SELECTOR_CODE 	equ (0x0001<<3) + TI_GDT + RPL0
+	SELECTOR_DATA 	equ (0x0002<<3) + TI_GDT + RPL0
+	SELECTOR_VIDEO	equ (0x0003<<3) + TI_GDT + RPL0
 
 	gdt_ptr dw GDT_LIMIT
 			dd GDT_BASE
@@ -28,6 +28,7 @@ section loader vstart=LOADER_BASE_ADDR
 	ards_nr dw 0
 
 loader_start:
+	mov sp,LOADER_BASE_ADDR
 ;打印"in loader"
 	mov byte [gs:160],'i'
 	mov byte [gs:161],0xa4
@@ -151,8 +152,8 @@ p_mode_start:
 	mov ax,SELECTOR_VIDEO
 	mov gs,ax
 
-	;打印"3"
-	mov byte [gs:240],'3'
+	;打印"P"
+	mov byte [gs:240],'P'
 	mov byte [gs:241],0xa4
 
 	mov eax,KERNEL_START_SECTOR

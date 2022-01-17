@@ -15,7 +15,7 @@
     15                              <1> DESC_L_32 			equ   		  000000_00000000_00000000b
     16                              <1> DESC_AVL  			equ    		   00000_00000000_00000000b
     17                              <1> DESC_LIMIT_CODE2 	equ 			1111_00000000_00000000b
-    18                              <1> DESC_LIMIT_DATA2 	equ				1111_00000000_00000000b
+    18                              <1> DESC_LIMIT_DATA2 	equ				DESC_LIMIT_CODE2
     19                              <1> DESC_LIMIT_VIDEO2	equ				0000_00000000_00000000b
     20                              <1> DESC_P				equ				     10000000_00000000b
     21                              <1> DESC_DPL_0			equ					  0000000_00000000b
@@ -23,7 +23,7 @@
     23                              <1> DESC_DPL_2			equ					  1000000_00000000b
     24                              <1> DESC_DPL_3			equ					  1100000_00000000b
     25                              <1> DESC_S_CODE			equ						10000_00000000b
-    26                              <1> DESC_S_DATA			equ						10000_00000000b
+    26                              <1> DESC_S_DATA			equ						DESC_S_CODE
     27                              <1> DESC_S_SYS			equ						00000_00000000b
     28                              <1> DESC_TYPE_CODE		equ						 1000_00000000b
     29                              <1> DESC_TYPE_DATA      equ						 0010_00000000b
@@ -32,7 +32,7 @@
     32                              <1>                                                                                                                                                                                                                        
     33                              <1> DESC_DATA_HIGH4 	equ (0x00<<24) + DESC_G_4K + DESC_D_32 + DESC_L_32 + DESC_AVL + 					DESC_LIMIT_DATA2 + DESC_P + DESC_DPL_0 + DESC_S_DATA + 					DESC_TYPE_DATA + 0x00
     34                              <1> 
-    35                              <1> DESC_VIDEO_HIGH4 	equ (0x00<<24) + DESC_G_4K + DESC_D_32 + DESC_L_32 + DESC_AVL + 					DESC_LIMIT_VIDEO2 + DESC_P + DESC_DPL_0 + DESC_S_DATA + 					DESC_TYPE_DATA + 0x0b
+    35                              <1> DESC_VIDEO_HIGH4 	equ (0x00<<24) + DESC_G_4K + DESC_D_32 + DESC_L_32 + DESC_AVL + 					DESC_LIMIT_VIDEO2 + DESC_P + DESC_DPL_0 + DESC_S_DATA + 					DESC_TYPE_DATA + 0x00
     36                              <1> ;-----------------------选择子属性----------------------
     37                              <1> RPL0 	equ 	00b
     38                              <1> RPL1 	equ 	01b
