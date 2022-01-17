@@ -1,7 +1,7 @@
-bochs/bochs.out
 bochs/bin/*
 bochs/share/*
 
 *.lst
 *.bin
 *.o
+*.out
