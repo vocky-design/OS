@@ -121,7 +121,8 @@ loader_start:
 	or  edx,eax
 	add edx,0x100000
 .error_halt:
-	;之后写一个输出
+	mov byte [gs:240],'e'
+	mov byte [gs:241],0xa4
 .mem_get_ok:
 	mov [total_mem_bytes],edx
 
@@ -153,14 +154,13 @@ p_mode_start:
 	mov gs,ax
 
 	;打印"P"
-	mov byte [gs:240],'P'
-	mov byte [gs:241],0xa4
-
+	mov byte [gs:320],'P'
+	mov byte [gs:321],0xa4
+	;加载kernel
 	mov eax,KERNEL_START_SECTOR
 	mov ebx,KERNEL_BIN_BASE_ADDR
 	mov cl,200
 	call rd_disk_m_32
-
 ;----------------------------------------------------------
 ;--------------------开启分页机制------------------------------
 ;----------------------------------------------------------
@@ -170,7 +170,7 @@ p_mode_start:
 	sgdt [gdt_ptr]
 	mov ebx,[gdt_ptr+2]
 	or dword [ebx+8*3+4],0xc0000000		;将显存段映射到内核地址
-	add dword [ebx],0xc0000000			;将gdt基址映射到内核地址
+	add dword [gdt_ptr+2],0xc0000000	;将GDTR寄存器的gdt基址映射到内核地址,其实页目录项还是对应的低
 	add esp,0xc0000000					;将栈指针映射到内核地址
 ;2.把页目录表地址赋值给cr3
 	mov eax,PAGE_DIR_TABLE_POS
@@ -182,12 +182,12 @@ p_mode_start:
 
 ;在开启分页后，用gdt新的地址重新加载
 	lgdt [gdt_ptr]
+	;打印"V"
+	mov byte [gs:480],'V'
+	mov byte [gs:481],0xa4
+
 	jmp dword SELECTOR_CODE:enter_kernel		;作用:1.清空流水线2.更新段描述符缓冲寄存器
 enter_kernel:
-	;打印"4"
-	mov byte [gs:320],'4'
-	mov byte [gs:321],0xa4
-
 	call kernel_init
 	mov esp,0xc009f000							;最高可用地址9fbff的4kb对齐	
 ;----------------------------------------------------------
@@ -195,63 +195,55 @@ enter_kernel:
 ;----------------------------------------------------------
 	jmp KERNEL_ENTRY_POINT
 
-
 ;------------------------------------------------
 ;功能：读取硬盘n个扇区
 ;输入：eax,ebx,cl(不能超过255)
 rd_disk_m_32:
-;------------------------------------------------
-	mov ch,cl
+;------------------------------------------------		
 	mov esi,eax
-;第一步：设置要读取的扇区数
+	;第一步：设置要读取的扇区数
  	mov dx,0x1f2
-	mov al,cl   
+	mov al,cl 					;sector count寄存器是8位。  
 	out dx,al
-
 	mov eax,esi
 
-;第二步：将LBA地址存入0x1f3-0x1f6
+	;第二步：将LBA地址存入0x1f3-0x1f6
 	mov dx,0x1f3
 	out dx,al
 
-	mov cl,8
-
-	shr eax,cl
+	shr eax,8
 	mov dx,0x1f4
 	out dx,al
 
-	shr eax,cl
+	shr eax,8
 	mov dx,0x1f5
 	out dx,al
 
-	shr eax,cl
+	shr eax,8
 	and al,0x0f
 	or  al,0xe0				;设置7-4位为1110,表示lba模式,主盘。	
 	mov dx,0x1f6				
 	out dx,al
-;第三步：向0x1f7端口写入读命令，0x20
+	;第三步：向0x1f7端口写入读命令，0x20
 	mov dx,0x1f7
 	mov al,0x20
 	out dx,al
-;第四步：检测硬盘状态
-.not_ready:
+	;第四步：检测硬盘状态
+	.not_ready:
 	nop
 	in al,dx
 	and al,0x88
 	cmp al,0x08
 	jnz .not_ready
-;第五步：从0x1f0端口读数据
-	mov al,ch
-	mov ah,0
+	;第五步：从0x1f0端口读数据
+	mov ax,0					;ax清零
+	mov al,cl					;假设cl不是0(0代表256个扇区)			？这里是个小bug
 	mov dx,256					;每次读入2个字节，所以一个扇区512字节需要读次数512/2=256
-	mul dx
-
-	mov cx,dx
-	shl ecx,16
+	mul dx						;如果乘数是16位，就把ax看作被乘数，结果存入dx:ax
 	mov cx,ax		
 		
 	mov dx,0x1f0
-.on_read:
+	.on_read:
 	in ax,dx
 	mov [ebx],ax
 	add ebx,2
@@ -264,40 +256,40 @@ rd_disk_m_32:
 ;输入：无
 setup_page:
 ;------------------------------------------------
-;先把页目录表占用的空间清零
+	;先把页目录表占用的空间清零
 	mov ecx,4096								;1024*4=4096
 	mov esi,0
-.clear_page_dir:
-	mov byte [PAGE_DIR_TABLE_POS+esi],0
+	.clear_page_dir:
+	mov byte [PAGE_DIR_TABLE_POS + esi],0
 	inc esi
 	loop .clear_page_dir
-;开始创建页目录项(PDE)
+	;开始创建页目录项(PDE)
 	mov eax,PAGE_DIR_TABLE_POS
 	add eax,0x1000
-	mov ebx,eax								;ebx is the head address of pte table.
+	mov ebx,eax								;此处为ebx赋值，是为.create_pte做准备，ebx是基址。
 
-	or eax,PG_US_U|PG_RW_R|PG_P				;make selector
-	mov [PAGE_DIR_TABLE_POS+0x000*4],eax
-	mov [PAGE_DIR_TABLE_POS+0x300*4],eax
+	or eax,PG_US_U|PG_RW_R|PG_P				;
+	mov [PAGE_DIR_TABLE_POS+0x000*4],eax	;在页目录表第一项，是页表基址
+	mov [PAGE_DIR_TABLE_POS+0x300*4],eax	;在页目录表的OS内存区第一项，是页表基址
 	sub eax,0x10000
-	mov [PAGE_DIR_TABLE_POS+0x3ff*4],eax
-;下面创建低1MB的页表项(PTE)
+	mov [PAGE_DIR_TABLE_POS+0x3ff*4],eax	;在页目录表的OS内存区最后一项，是页目录表基址
+	;下面创建低1MB的页表项(PTE)
 	mov ecx,256								;1MB/4KB=256
 	mov esi,0
-	mov edx,PG_US_U|PG_RW_R|PG_P
-.create_pte:
+	mov edx,0|PG_US_U|PG_RW_R|PG_P
+	.create_pte:
 	mov [ebx+esi*4],edx
 	add edx,0x1000							;0x1000:4kb
 	inc esi
 	loop .create_pte
-;创建虚拟地址内核区其他页表的PDE
+	;创建虚拟地址内核区其他页表的PDE
 	mov eax,PAGE_DIR_TABLE_POS
 	add eax,0x1000*2						;the address of second pte table
 	or 	eax,PG_US_U|PG_RW_R|PG_P
 	mov ebx,PAGE_DIR_TABLE_POS
-	mov ecx,256-2					;范围为第769-1022的所有目录项数量，768和1023有特别用途。
+	mov ecx,254					;范围为第769-1022的所有目录项数量，768和1023有特别用途。
 	mov esi,769
-.create_kernel_pde:
+	.create_kernel_pde:
 	mov [ebx+esi*4],eax
 	add eax,0x1000
 	inc esi

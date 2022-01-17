@@ -55,29 +55,26 @@ SECTION MBR vstart=0x7c00
 ;输入：eax,bx,cl
 rd_disk_m_16:
 ;------------------------------------------------
-	mov ch,cl
 	mov esi,eax
 ;第一步：设置要读取的扇区数
  	mov dx,0x1f2
 	mov al,cl
 	out dx,al
-
 	mov eax,esi
+
 ;第二步：将LBA地址存入0x1f3-0x1f6
 	mov dx,0x1f3
 	out dx,al
 
-	mov cl,8
-
-	shr eax,cl
+	shr eax,8
 	mov dx,0x1f4
 	out dx,al
 
-	shr eax,cl
+	shr eax,8
 	mov dx,0x1f5
 	out dx,al
 
-	shr eax,cl
+	shr eax,8
 	and al,0x0f
 	or  al,0xe0					;设置7-4位为1110,表示lba模式,主盘。
 	mov dx,0x1f6				
@@ -94,8 +91,8 @@ rd_disk_m_16:
 	cmp al,0x08
 	jnz .not_ready
 ;第五步：从0x1f0端口读数据
-	mov al,ch
-	mov ah,0
+	mov ax,0
+	mov al,cl
 	mov dx,256					;每次读入2个字节，所以一个扇区512字节需要读次数512/2=256
 	mul dx,
 	mov cx,ax		

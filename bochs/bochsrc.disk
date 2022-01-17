@@ -1,8 +1,8 @@
 #设置bochs的运行内存
 megs: 32
 #设置BIOS和VGA BIOS
-romimage: file=/home/vocky/OS/bochs/share/bochs/BIOS-bochs-latest
-vgaromimage: file=/home/vocky/OS/bochs/share/bochs/VGABIOS-lgpl-latest
+romimage: file=share/bochs/BIOS-bochs-latest
+vgaromimage: file=share/bochs/VGABIOS-lgpl-latest
 #选择启动盘符
 boot: disk
 #设置日志文件的输出
@@ -10,8 +10,8 @@ log: bochs.out
 #关闭鼠标，并打开键盘
 mouse: enabled=0
 #keyboard_mapping: enabled=1
-#map=/home/vocky/OS/bochs/share/bochs/keymaps/x11-pc-us.map
-keyboard:keymap=/home/vocky/OS/bochs/share/bochs/keymaps/x11-pc-us.map
+#map=share/bochs/keymaps/x11-pc-us.map
+keyboard:keymap=share/bochs/keymaps/x11-pc-us.map
 #硬盘设置
 ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14
 ata0-master: type=disk,path="hd60M.img",mode=flat,cylinders=121,heads=16,spt=63
