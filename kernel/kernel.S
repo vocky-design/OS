@@ -3,6 +3,7 @@
 %define ZERO        push 0              ;push 立即数,8位按模式默认操作数大小扩展压栈,16位和32位按操作数大小压栈。
 
 extern put_str                          ;声明外部函数
+extern idt_function                     ;声明存储中断函数地址的数组idt_function[]
 global intr_entry_table
 
 section .data
@@ -13,15 +14,27 @@ intr_entry_table:
 section .text
 intr%1entry:
     %2
-    push intr_str
-    call put_str
-    add  esp,4
+    ;因为不知道中断函数内容，所以要保存所有上下文环境。
+    push ds 
+    push es
+    push fs
+    push gs
+    pushad              ;PUSHAD指令压入32位寄存器，入栈顺序为：EAX->ECX->EDX->EBX->ESP->EBP->ESI->EDI
     ;发送EOI
     mov al,0x20
     out 0xa0,al
     out 0x20,al
-
+    ;调用中断函数
+    push %1             ;不论idt_function中的目标函数是否需要参数，都一律压入中断向量号，调试时很方便。
+    call [idt_function + %1*4]
     add esp,4
+    ;回复上下文环境，退出
+    popad
+    pop gs
+    pop fs
+    pop es
+    pop ds
+    add esp,4           ;跳过error_code
     iret
 section .data
     dd intr%1entry
