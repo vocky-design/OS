@@ -3,8 +3,47 @@
 #include "global.h"
 #include "print.h"
 #include "io.h"
-#define IDT_DESC_CNT 0x21
+#define IDT_DESC_CNT    0x21
 
+#define EFLAGS_IF       0x00000200
+#define GET_EFLAGS(eflags)      asm volatile ("pushfl; popl %0":"=m"(eflags))
+/* 获取IF标志位状态 */
+static enum intr_status intr_get_status(void)
+{
+    uint32_t eflags = 0;
+    GET_EFLAGS(eflags);
+    return (EFLAGS_IF & eflags) ? INTR_ON:INTR_OFF ;
+}
+/* 开中断和关中断函数 */
+static enum intr_status intr_enable()
+{
+    enum intr_status old_status;
+    if(INTR_ON == intr_get_status()) {
+        old_status = INTR_ON;
+        return old_status;
+    } else {
+        old_status = INTR_OFF;
+        asm volatile ("sti");
+        return old_status;
+    }
+}
+static enum intr_status intr_disable()
+{
+    enum intr_status old_status;
+    if(INTR_ON == intr_get_status()) {
+        old_status = INTR_ON;
+        asm volatile ("cli");
+        return old_status;
+    } else {
+        old_status = INTR_OFF;
+        return old_status;
+    }
+}
+/* 将中断状态设置为status */
+enum intr_status intr_set_status(enum intr_status status)
+{
+    return status & INTR_ON ? intr_enable():intr_disable();
+}
 /* 中断门描述符结构体 */
 struct gate_desc {
     uint16_t func_offset_low_word;
@@ -27,6 +66,7 @@ static void general_intr_handler(uint8_t vec_nr)
     put_int(vec_nr);
     put_char('\n');
 }
+/* 填俩表：intr_name[],idt_function[] */
 static void exception_init(void)
 {
     for(int i=0; i<IDT_DESC_CNT; ++i)
