@@ -1,5 +1,6 @@
 #include "string.h"
-
+#include "stdint.h"
+#include "debug.h"
 void memset(void *dst_,uint8_t value, uint32_t size)
 {
     ASSERT(dst_ != NULL);
@@ -17,6 +18,7 @@ void memcpy(void *dst_, const void *src_, uint32_t size)
         *dst++ = *src++;
     }
 }
+//*a>*b返回1，*a<*b返回-1，*a==*b返回0
 int8_t memcmp(const void *a_, const void *b_, uint32_t size)
 {
     ASSERT(a_ != NULL && b_ != NULL);

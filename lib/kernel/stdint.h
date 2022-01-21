@@ -2,6 +2,7 @@
 #define _LIB_STDINT_H
 
 typedef signed 	char 	int8_t;
+typedef signed 	char 	bool;
 typedef signed 	short 	int16_t;
 typedef signed 	int		int32_t;
 typedef signed 	long long	int64_t;
@@ -11,5 +12,4 @@ typedef unsigned int 	uint32_t;
 typedef unsigned long long 	uint64_t;
 
 #define NULL 0
-
 #endif
