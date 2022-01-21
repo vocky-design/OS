@@ -4,25 +4,26 @@ LD = ld
 BUILD_DIR = ./build
 BOCHS_DIR = ./bochs
 ENTRY_POINT = 0xc0001500
-LIB = lib/kernel/
+LIB = -I lib/kernel/ -I kernel/ -I lib/
 ASFLAGS = -f elf32
-CFLAGS  = -m32 -I $(LIB) -fno-builtin -Wall -Wstrict-prototypes -Wmissing-prototypes -c
+CFLAGS  = -m32 $(LIB) -fno-builtin -fno-stack-protector -Wall -Wstrict-prototypes -Wmissing-prototypes -c
 LDFLAGS = -m elf_i386 -Ttext $(ENTRY_POINT) -e main
 OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/init.o $(BUILD_DIR)/interrupt.o $(BUILD_DIR)/timer.o \
-	$(BUILD_DIR)/kernel.o $(BUILD_DIR)/print.o $(BUILD_DIR)/debug.o 
+	$(BUILD_DIR)/kernel.o $(BUILD_DIR)/print.o $(BUILD_DIR)/debug.o $(BUILD_DIR)/string.o
 
 ####################### C编译 #######################################
 $(BUILD_DIR)/main.o: kernel/main.c lib/kernel/print.h kernel/debug.h kernel/init.h
 	$(CC) $(CFLAGS) -o $@ $<
-$(BUILD_DIR)/init.o: kernel/init.c lib/kernel/print.h kernel/interrupt.h kernel/timer.h
+$(BUILD_DIR)/init.o: kernel/init.c kernel/init.h lib/kernel/print.h kernel/interrupt.h kernel/timer.h
 	$(CC) $(CFLAGS) -o $@ $<
-$(BUILD_DIR)/interrupt.o: kernel/interrupt.c lib/kernel/print.h lib/kernel/stdint.h kernel/global.h lib/kernel/io.h
+$(BUILD_DIR)/interrupt.o: kernel/interrupt.c kernel/interrupt.h lib/kernel/print.h lib/kernel/stdint.h kernel/global.h lib/kernel/io.h
 	$(CC) $(CFLAGS) -o $@ $<
-$(BUILD_DIR)/timer.o: kernel/timer.c lib/kernel/io.h lib/kernel/print.h
+$(BUILD_DIR)/timer.o: kernel/timer.c kernel/timer.h lib/kernel/io.h lib/kernel/print.h
 	$(CC) $(CFLAGS) -o $@ $<
-$(BUILD_DIR)/debug.o: kernel/debug.c lib/kernel/print.h kernel/interrupt.h
+$(BUILD_DIR)/debug.o: kernel/debug.c kernel/debug.h lib/kernel/print.h kernel/interrupt.h
 	$(CC) $(CFLAGS) -o $@ $<
-
+$(BUILD_DIR)/string.o: lib/string.c lib/string.h lib/kernel/stdint.h kernel/debug.h
+	$(CC) $(CFLAGS) -o $@ $<
 ####################### NASM编译 #######################################
 $(BUILD_DIR)/kernel.o: kernel/kernel.S 
 	$(AS) $(ASFLAGS) -o $@ $<
@@ -31,7 +32,7 @@ $(BUILD_DIR)/print.o: lib/kernel/print.S
 
 ####################### 链接所有文件 #######################################
 $(BUILD_DIR)/kernel.bin: $(OBJS)	
-	$(LD) $(LDFLAGS) $(OBJS) -o $@ $^
+	$(LD) $(LDFLAGS) -o $@ $^
 
 .PHONY:	mk_dir hd clean all
 mk_dir:

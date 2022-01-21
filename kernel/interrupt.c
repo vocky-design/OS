@@ -15,7 +15,7 @@ static enum intr_status intr_get_status(void)
     return (EFLAGS_IF & eflags) ? INTR_ON:INTR_OFF ;
 }
 /* 开中断和关中断函数 */
-static enum intr_status intr_enable()
+static enum intr_status intr_enable(void)
 {
     enum intr_status old_status;
     if(INTR_ON == intr_get_status()) {
@@ -27,12 +27,12 @@ static enum intr_status intr_enable()
         return old_status;
     }
 }
-static enum intr_status intr_disable()
+static enum intr_status intr_disable(void)
 {
     enum intr_status old_status;
     if(INTR_ON == intr_get_status()) {
         old_status = INTR_ON;
-        asm volatile ("cli");
+        asm volatile ("cli");                       //注意：此处与书籍给出不符
         return old_status;
     } else {
         old_status = INTR_OFF;
