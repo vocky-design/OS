@@ -9,7 +9,8 @@ ASFLAGS = -f elf32
 CFLAGS  = -m32 $(LIB) -fno-builtin -fno-stack-protector -Wall -Wstrict-prototypes -Wmissing-prototypes -c
 LDFLAGS = -m elf_i386 -Ttext $(ENTRY_POINT) -e main
 OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/init.o $(BUILD_DIR)/interrupt.o $(BUILD_DIR)/timer.o \
-	$(BUILD_DIR)/kernel.o $(BUILD_DIR)/print.o $(BUILD_DIR)/debug.o $(BUILD_DIR)/string.o $(BUILD_DIR)/bitmap.o
+	$(BUILD_DIR)/kernel.o $(BUILD_DIR)/print.o $(BUILD_DIR)/debug.o $(BUILD_DIR)/string.o $(BUILD_DIR)/bitmap.o \
+	$(BUILD_DIR)/memory.o
 
 ####################### C编译 #######################################
 $(BUILD_DIR)/main.o: kernel/main.c lib/kernel/print.h kernel/debug.h kernel/init.h
@@ -25,6 +26,8 @@ $(BUILD_DIR)/debug.o: kernel/debug.c kernel/debug.h lib/kernel/print.h kernel/in
 $(BUILD_DIR)/string.o: lib/string.c lib/string.h lib/kernel/stdint.h kernel/debug.h
 	$(CC) $(CFLAGS) -o $@ $<
 $(BUILD_DIR)/bitmap.o: lib/kernel/bitmap.c lib/kernel/bitmap.h lib/kernel/stdint.h lib/string.h
+	$(CC) $(CFLAGS) -o $@ $<
+$(BUILD_DIR)/memory.o: kernel/memory.c kernel/memory.h kernel/debug.h lib/kernel/print.h 
 	$(CC) $(CFLAGS) -o $@ $<
 ####################### NASM编译 #######################################
 $(BUILD_DIR)/kernel.o: kernel/kernel.S 
