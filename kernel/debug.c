@@ -14,4 +14,5 @@ void panic_spin(const char *filename, int line, const char *func, const char *co
     put_str("condition:");put_str(condition);put_char('\n');
 
     while(1);
+    
 }

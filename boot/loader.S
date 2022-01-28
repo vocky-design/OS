@@ -269,9 +269,9 @@ setup_page:
 	mov ebx,eax								;此处为ebx赋值，是为.create_pte做准备，ebx是基址。
 
 	or eax,PG_US_U|PG_RW_R|PG_P				;
-	mov [PAGE_DIR_TABLE_POS+0x000*4],eax	;在页目录表第一项，是页表基址
+	mov [PAGE_DIR_TABLE_POS+0x000*4],eax	;在页目录表第一项，是是第一个页表基址
 	mov [PAGE_DIR_TABLE_POS+0x300*4],eax	;在页目录表的OS内存区第一项，是页表基址
-	sub eax,0x10000
+	sub eax,0x1000
 	mov [PAGE_DIR_TABLE_POS+0x3ff*4],eax	;在页目录表的OS内存区最后一项，是页目录表基址
 	;下面创建低1MB的页表项(PTE)
 	mov ecx,256								;1MB/4KB=256

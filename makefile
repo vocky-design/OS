@@ -27,7 +27,7 @@ $(BUILD_DIR)/string.o: lib/string.c lib/string.h lib/kernel/stdint.h kernel/debu
 	$(CC) $(CFLAGS) -o $@ $<
 $(BUILD_DIR)/bitmap.o: lib/kernel/bitmap.c lib/kernel/bitmap.h lib/kernel/stdint.h lib/string.h
 	$(CC) $(CFLAGS) -o $@ $<
-$(BUILD_DIR)/memory.o: kernel/memory.c kernel/memory.h kernel/debug.h lib/kernel/print.h 
+$(BUILD_DIR)/memory.o: kernel/memory.c kernel/memory.h kernel/debug.h lib/kernel/print.h lib/kernel/stdint.h lib/kernel/bitmap.h lib/string.h
 	$(CC) $(CFLAGS) -o $@ $<
 ####################### NASM编译 #######################################
 $(BUILD_DIR)/kernel.o: kernel/kernel.S 
