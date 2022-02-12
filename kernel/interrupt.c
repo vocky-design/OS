@@ -3,19 +3,34 @@
 #include "global.h"
 #include "print.h"
 #include "io.h"
-#define IDT_DESC_CNT    0x21
 
+#define IDT_DESC_CNT    0x30
 #define EFLAGS_IF       0x00000200
 #define GET_EFLAGS(eflags)      asm volatile ("pushfl; popl %0":"=m"(eflags))
+
+/* 中断门描述符结构体 */
+struct gate_desc {
+    uint16_t func_offset_low_word;
+    uint16_t selector;
+    uint8_t  dcount;                //固定0
+    uint8_t  attribute;
+    uint16_t func_offset_high_word;
+};
+static struct gate_desc IDT[IDT_DESC_CNT];
+char* intr_name[IDT_DESC_CNT];              //和下面的函数地址是联系的。
+intr_handler idt_function[IDT_DESC_CNT];
+extern intr_handler intr_entry_table[IDT_DESC_CNT];
+
 /* 获取IF标志位状态 */
-static enum intr_status intr_get_status(void)
+enum intr_status intr_get_status(void)
 {
     uint32_t eflags = 0;
     GET_EFLAGS(eflags);
     return (EFLAGS_IF & eflags) ? INTR_ON:INTR_OFF ;
 }
+
 /* 开中断和关中断函数 */
-static enum intr_status intr_enable(void)
+enum intr_status intr_enable(void)
 {
     enum intr_status old_status;
     if(INTR_ON == intr_get_status()) {
@@ -27,7 +42,7 @@ static enum intr_status intr_enable(void)
         return old_status;
     }
 }
-static enum intr_status intr_disable(void)
+enum intr_status intr_disable(void)
 {
     enum intr_status old_status;
     if(INTR_ON == intr_get_status()) {
@@ -39,33 +54,41 @@ static enum intr_status intr_disable(void)
         return old_status;
     }
 }
+
 /* 将中断状态设置为status */
 enum intr_status intr_set_status(enum intr_status status)
 {
     return status & INTR_ON ? intr_enable():intr_disable();
 }
-/* 中断门描述符结构体 */
-struct gate_desc {
-    uint16_t func_offset_low_word;
-    uint16_t selector;
-    uint8_t  dcount;                //固定0
-    uint8_t  attribute;
-    uint16_t func_offset_high_word;
-};
-static struct gate_desc IDT[IDT_DESC_CNT];
-char* intr_name[IDT_DESC_CNT];
-intr_handler idt_function[IDT_DESC_CNT];
-extern intr_handler intr_entry_table[IDT_DESC_CNT];
+
 /* 通用的中断处理函数，一般用在异常出现时的处理 */
 static void general_intr_handler(uint8_t vec_nr)
 {
+    //0x2f是从片8259A上的最后一个irq引脚，保留。
     if(vec_nr == 0x27 || vec_nr == 0x2f) {
-        return;
+        return;     //IRQ7和IRQ15会产生伪中断，无需处理。
     }
-    put_str("init vector: 0x");
-    put_int(vec_nr);
-    put_char('\n');
+    //从屏幕左上角清理出一片打印异常信息的区域，方便阅读
+    set_cursor(0);
+    uint16_t cursor_pos = 0;
+    while(cursor_pos++ < 4*80) {
+        put_char(' ');
+    }
+    //打印信息
+    set_cursor(0);
+    put_str("!!!!!!     exception message begin     !!!!!!\n");
+    set_cursor(88);
+    put_str(intr_name[vec_nr]);put_char('\n');
+    if(vec_nr == 14) {      //如果Pagefault，将缺失的地址打印出来并悬停
+        uint32_t page_fault_vaddr = 0;
+        asm volatile ("movl %%cr2,%0" : "=r"(page_fault_vaddr));        //cr2存放造成page fault的地址。
+        put_str("page fault addr is ");put_int(page_fault_vaddr);put_char('\n');
+    }
+    put_str("!!!!!!     exception message end       !!!!!!\n");
+    //悬停
+    while(1);
 }
+
 /* 填俩表：intr_name[],idt_function[] */
 static void exception_init(void)
 {
@@ -97,6 +120,13 @@ static void exception_init(void)
     intr_name[19] = "#XF SIMD Floating-Point Exception";
 
 }
+
+/* 中断注册函数 */
+void register_handler(uint8_t vector_no, intr_handler function)
+{
+    idt_function[vector_no] = function;
+}
+
 /* 初始化中断门描述符 */
 static void make_idt_desc(struct gate_desc *p_gdesc, uint8_t attr, intr_handler function)
 {
@@ -106,6 +136,7 @@ static void make_idt_desc(struct gate_desc *p_gdesc, uint8_t attr, intr_handler 
     p_gdesc->attribute = attr;
     p_gdesc->func_offset_high_word =  ((uint32_t)function && 0xFFFF0000) >> 16;
 }
+
 /* 初始化IDT */
 static void idt_desc_init(void)
 {
@@ -114,6 +145,7 @@ static void idt_desc_init(void)
     }
     put_str("   idt_desc_init done\n");
 }
+
 /* 初始化8259A */
 static void pic_init(void)
 {
@@ -128,17 +160,17 @@ static void pic_init(void)
     outb(0xa1, 0x02);
     outb(0xa1, 0x01);
     //只打开主片上IR0，也就是目前只接受时钟产生的中断
-    outb(0x21, 0xfe);
+    outb(0x21, 0xfd);
     outb(0xa1, 0xff);
 
     put_str("   pic_init done\n");
 }
+
 /* 完成有关中断的所有初始化工作 
 1.初始化IDT
 2.初始化PIC
 3.加载IDT
 */
-
 void idt_init(void)
 {
     put_str("idt_init start\n");

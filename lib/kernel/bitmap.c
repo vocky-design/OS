@@ -15,25 +15,26 @@ bool bitmap_bit_test(struct bitmap *btmp, uint32_t bit_idx)
     return btmp->bytes[byte_idx] & (1 << byte_odd) ;
 }
 /* 在位图中申请连续cnt个位，成功，则返回其起始位下标，失败返回-1 */
-int32_t bitmap_scan(struct bitmap *btmp, uint32_t cnt)
+uint32_t bitmap_scan(struct bitmap *btmp, uint32_t cnt)
 {
     uint32_t byte_idx = 0;
     while(0xff == btmp->bytes[byte_idx] && byte_idx < btmp->btmp_bytes_len) {
         ++byte_idx;
     }
-    ASSERT(byte_idx < btmp->btmp_bytes_len);
     if(byte_idx == btmp->btmp_bytes_len) {
         return -1;
     }
+    ASSERT(byte_idx < btmp->btmp_bytes_len);
+
 
     //若在位图数组范围内的某字节内找到了空闲位，在该字节内逐位比对，找到空闲位的索引。
-    uint32_t bit_idx = 0;
-    while((1<<bit_idx) & btmp->bytes[byte_idx]) {
-        ++bit_idx;
+    uint8_t i = 0;
+    while(btmp->bytes[byte_idx] & (1<<i)) {
+        ++i;
     }
-    uint32_t bit_idx_start = byte_idx * 8 + bit_idx;
+    uint32_t bit_idx_start = byte_idx * 8 + i;
     if(cnt == 1) {
-        return (int32_t)bit_idx_start;
+        return (uint32_t)bit_idx_start;
     }
     uint32_t bit_left = btmp->btmp_bytes_len * 8 - bit_idx_start;
     uint32_t next_bit_idx = bit_idx_start + 1;
@@ -51,7 +52,7 @@ int32_t bitmap_scan(struct bitmap *btmp, uint32_t cnt)
         }
         ++next_bit_idx;
     }
-    return (int32_t)bit_idx_start;
+    return (uint32_t)bit_idx_start;
 }
 /* 将位图btmp的bit_idx位设置为value */
 void bitmap_set(struct bitmap *btmp, uint32_t bit_idx, bool value)

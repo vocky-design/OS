@@ -5,7 +5,7 @@
 /* 打印文件名、行号、函数名、条件并使程序悬停 */
 void panic_spin(const char *filename, int line, const char *func, const char *condition)
 {
-    intr_set_status(INTR_OFF);          //关中断
+    intr_disable();          //关中断
 
     put_str("\n\n\n!!! error !!!\n\n\n");
     put_str("filename:");put_str(filename);put_char('\n');

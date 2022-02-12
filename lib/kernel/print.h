@@ -4,4 +4,5 @@
 void put_char(const uint8_t char_asci);
 void put_str(const char *message);
 void put_int(const uint32_t num);
+void set_cursor(uint16_t pos);
 #endif

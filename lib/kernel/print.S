@@ -9,6 +9,7 @@ section .text
 global put_char
 global put_str
 global put_int
+global set_cursor
 ;-----------------------------------------------------------------
 ;功能描述：把栈中的一个字符写入光标所在处。
 ;入口参数：2字节压栈。
@@ -172,6 +173,33 @@ put_int:
     add esp,2
     inc edi
     loop .goon
+
+    popad
+    ret
+
+
+;-----------------------------------------------------------------
+;功能描述：设置光标位置
+;入口参数：2字节压栈。
+set_cursor:
+;-----------------------------------------------------------------
+    pushad
+
+    mov bx,[esp + 4*8 + 4]
+
+    mov dx,0x03d4
+    mov al,0x0e
+    out dx,al
+    mov dx,0x03d5
+    mov al,bh
+    out dx,al
+
+    mov dx,0x03d4
+    mov al,0x0f
+    out dx,al
+    mov dx,0x03d5
+    mov al,bl
+    out dx,al
 
     popad
     ret

@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "stdint.h": "c",
+        "interrupt.h": "c",
+        "keyboard.h": "c",
+        "io.h": "c"
+    }
+}

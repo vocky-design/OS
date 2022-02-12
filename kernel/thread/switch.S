@@ -1,0 +1,18 @@
+section .text
+global switch_to
+switch_to:
+    push esi
+    push edi
+    push ebx
+    push ebp
+    mov eax,[esp + 20]
+    mov [eax],esp       ;将栈顶指针esp保存在PCB的self_kstack处
+
+    ;-----以上是备份当前线程的环境，下面是恢复下一个线程的环境--------
+    mov eax,[esp + 24]
+    mov esp,[eax]
+    pop ebp
+    pop ebx
+    pop edi
+    pop esi
+    ret

@@ -14,7 +14,7 @@ intr_entry_table:
 section .text
 intr%1entry:
     %2
-    ;因为不知道中断函数内容，所以要保存所有上下文环境。
+    ;保存(用户)上下文环境。
     push ds 
     push es
     push fs
@@ -28,7 +28,7 @@ intr%1entry:
     push %1             ;不论idt_function中的目标函数是否需要参数，都一律压入中断向量号，调试时很方便。
     call [idt_function + %1*4]
     add esp,4
-    ;回复上下文环境，退出
+    ;恢复上下文环境，退出
     popad
     pop gs
     pop fs
@@ -72,5 +72,20 @@ VECTOR 0x1c,ZERO
 VECTOR 0x1d,ZERO
 VECTOR 0x1e,ERROR_CODE
 VECTOR 0x1f,ZERO
-VECTOR 0x20,ZERO
+VECTOR 0x20,ZERO        ;时钟中断
+VECTOR 0x21,ZERO        ;键盘中断
+VECTOR 0x22,ZERO        ;级联yong
+VECTOR 0x23,ZERO        ;串口2
+VECTOR 0x24,ZERO        ;串口1
+VECTOR 0x25,ZERO        ;并口2
+VECTOR 0x26,ZERO        ;软盘
+VECTOR 0x27,ZERO        ;并口1
+VECTOR 0x28,ZERO        ;实时时钟
+VECTOR 0x29,ZERO        ;重定向
+VECTOR 0x2a,ZERO        ;保留
+VECTOR 0x2b,ZERO        ;保留
+VECTOR 0x2c,ZERO        ;ps/2鼠标
+VECTOR 0x2d,ZERO        ;fpu浮点单元异常
+VECTOR 0x2e,ZERO        ;硬盘
+VECTOR 0x2f,ZERO        ;保留
 

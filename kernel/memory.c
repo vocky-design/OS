@@ -5,7 +5,7 @@
 
 #define PG_SIZE                 4096
 #define MEM_BITMAP_BASE       0xc009a000  //1个物理块的PCB+4个物理块的位图
-#define K_HEAP_START            0xc0100000  //跨过低端1MB内存，其实后面还要跨过loader.S中定义的页目录表和页表占用的物理地址0x100000-0x101ff。
+#define K_HEAP_START          0xc0100000  //跨过低端1MB内存，其实后面还要跨过loader.S中定义的页目录表和页表占用的物理地址0x100000-0x101ff。
 
 #define PDE_IDX(addr)          ((addr & 0xffc00000) >> 22)
 #define PTE_IDX(addr)          ((addr & 0x003ff000) >> 12)
