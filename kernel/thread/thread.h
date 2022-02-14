@@ -1,8 +1,12 @@
 #ifndef _KERNEL_THREAD_H
 #define _KERNEL_THREAD_H
 #include "stdint.h"
+#include "print.h"
+#include "debug.h"
+#include "string.h"
 #include "list.h"
-
+#include "interrupt.h"
+#include "memory.h"
 /* 自定义通用函数类型 */
 typedef void thread_func(void *);
 
@@ -60,9 +64,9 @@ struct task_struct {
     char name[16];
     uint8_t priority;
     uint8_t ticks;
-    uint32_t elapsed_ticks;      // 此任务自上CPU运行后至今占用了多少CPU滴答数
-    uint32_t *pgdir;            //进程自己页表的虚拟地址
-
+    uint32_t elapsed_ticks;             // 此任务自上CPU运行后至今占用了多少CPU滴答数
+    uint32_t *pgdir;                    //进程自己页目录表的虚拟地址
+    struct vaddr_pool userprog_vaddr_pool;
     struct list_elem general_tag;
     struct list_elem all_list_tag;
 
@@ -75,4 +79,5 @@ void thread_init(void);
 void schedule(void);
 void thread_block(enum task_status stat);
 void thread_unblock(struct task_struct *pthread);
+
 #endif

@@ -1,7 +1,5 @@
 #include "memory.h"
-#include "debug.h"
-#include "print.h"
-#include "string.h"
+#include "thread.h"
 
 #define PG_SIZE                 4096
 #define MEM_BITMAP_BASE       0xc009a000  //1个物理块的PCB+4个物理块的位图
@@ -13,6 +11,7 @@
 #define ALL_MEM_ADDRESS        0xc0000b00 
 
 struct paddr_pool {
+    struct lock lock;
     struct bitmap pool_bitmap;
     uint32_t paddr_start;
     uint32_t pool_size;         //以页为基本单位  4KB
@@ -50,6 +49,8 @@ static void mem_pool_init(uint32_t all_mem)
     
     bitmap_init(&kernel_pool.pool_bitmap);
     bitmap_init(&user_pool.pool_bitmap);
+    lock_init(&kernel_pool.lock);
+    lock_init(&user_pool.lock);
     //输出内存池信息
     put_str("   kernel_pool_bitmap_start:");
     put_int((uint32_t)kernel_pool.pool_bitmap.bytes);
@@ -112,7 +113,17 @@ static void *vaddr_get(enum pool_flag pf, uint32_t pg_cnt)
         }
         vaddr_start = kernel_vaddr_pool.vaddr_start + bit_idx_start * PG_SIZE;
     } else {
-
+        struct task_struct *cur_thread = running_thread();
+        bit_idx_start = bitmap_scan(&cur_thread->userprog_vaddr.pool_bitmap, pg_cnt);
+        if(bit_idx_start == -1) {
+            return NULL;
+        }
+        while(cnt < pg_cnt) {
+            bitmap_set(&cur_thread->userprog_vaddr.pool_bitmap, bit_idx_start+cnt++, 1);
+        }
+        vaddr_start = cur_thread->userprog_vaddr.vaddr_start + bit_idx_start * PG_SIZE;        
+        //(0xc0000000-PG_SZIE)作为用户3级栈已经在start_process被分配
+        ASSERT(vaddr_start < (0xc0000000-PG_SIZE));
     }
     return (void *)vaddr_start;
 }
@@ -178,7 +189,7 @@ static void page_table_add(void *_vaddr, void *_paddr)
 }
 
 /* 分配cnt个页空间，成功则返回起始虚拟地址，失败返回NULL */
-void *malloc_page(enum pool_flag pf, uint32_t pg_cnt)
+static void *malloc_page(enum pool_flag pf, uint32_t pg_cnt)
 {
     ASSERT(pg_cnt >0 && pg_cnt < 3840);      //15MB*1024*1024/4096=3840页
     //三步：
@@ -205,14 +216,71 @@ void *malloc_page(enum pool_flag pf, uint32_t pg_cnt)
     return vaddr_start;
 }
 
-/* 从内核物理内存池申请一页内存，成功则返回虚拟地址，失败返回NULL */
+/* 从内核物理内存池申请一页内存，并清空 */
+/* 成功则返回虚拟地址，失败返回NULL */
 void *get_kernel_pages(uint32_t pg_cnt)
 {
+    lock_acquire(&kernel_pool.lock);
     void *vaddr = malloc_page(PF_KERNEL, pg_cnt);
     if(vaddr != NULL) {
         memset(vaddr, 0 , pg_cnt*PG_SIZE);
     }
+    lock_release(&kernel_pool.lock);
     return vaddr;
 }
+/* 从用户物理内存池申请一页内存，并清空 */
+/* 成功则返回虚拟地址，失败返回NULL */
+void *get_user_pages(uint32_t pg_cnt)
+{
+    lock_acquire(&user_pool.lock);
+    void *vaddr = malloc_page(PF_USER, pg_cnt);
+    if(vaddr != NULL) {
+        memset(vaddr, 0 , pg_cnt*PG_SIZE);
+    }
+    lock_release(&user_pool.lock);
+    return vaddr;
+}
+/* 申请一页空间分配，返回虚拟地址 */
+void *get_a_page(enum pool_flag pf, uint32_t vaddr)
+{
+    struct paddr_pool *mem_pool = pf & PF_KERNEL ? &kernel_pool: &user_pool;
+    lock_acquire(&mem_pool->lock);
+    //申请虚拟地址
+    struct task_struct *cur = running_thread();
+    int32_t bit_idx = -1;
+    if(cur->pgdir != NULL && pf == PF_USER) {
+        bit_idx = (vaddr - cur->userprog_vaddr.vaddr_start) / PG_SIZE;
+        ASSERT(bit_idx > 0);
+        if(!bitmap_bit_test(&cur->userprog_vaddr.pool_bitmap, bit_idx)) {           //此位没有占用
+            bitmap_set(&cur->userprog_vaddr.pool_bitmap, bit_idx, 1);
+        } else {
+            PANIC("get_a_page: This bit is occupied on the bitmap");
+        }
+    } else if(cur->pgdir == NULL && pf == PF_KERNEL) {
+        bit_idx = (vaddr - kernel_vaddr_pool.vaddr_start) / PG_SIZE;
+        ASSERT(bit_idx > 0);
+        if(!bitmap_bit_test(&kernel_vaddr_pool.pool_bitmap, bit_idx)) {
+            bitmap_set(&kernel_vaddr_pool.pool_bitmap, bit_idx, 1);
+        } else {
+            PANIC("get a page: This bit is occupied on the bitmap");
+        }
+    } else {
+        PANIC("get_a_page: not allow 'kernel alloc userspace' or 'user alloc kernelspace'");
+    }
+    //做好虚拟地址与物理地址的映射
+    void *alloced_phyaddr = paddr_get(mem_pool);
+    if(alloced_phyaddr == NULL) {
+        return NULL;
+    }
+    page_table_add((void *)vaddr, alloced_phyaddr);
+    //
+    lock_release(&mem_pool->lock);
+    return (void *)vaddr;
+}
 
-
+/* 计算虚拟地址映射到的物理地址 */
+uint32_t addr_v2p(uint32_t vaddr)
+{
+    uint32_t *pte = pte_ptr(vaddr);
+    return (*pte & 0xfffff000) + (vaddr & 0x00000fff);
+}

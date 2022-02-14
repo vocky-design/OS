@@ -1,10 +1,4 @@
 #include "thread.h"
-#include "string.h"
-#include "memory.h"
-#include "interrupt.h"
-#include "debug.h"
-#include "list.h"
-#include "print.h"
 
 extern void switch_to(struct task_struct *cur_thread, struct task_struct *next_thread);
 

@@ -1,16 +1,6 @@
 {
     "files.associations": {
-        "stdint.h": "c",
-        "interrupt.h": "c",
-        "keyboard.h": "c",
-        "io.h": "c",
-        "thread.h": "c",
-        "print.h": "c",
-        "debug.h": "c",
-        "string.h": "c",
-        "global.h": "c",
-        "init.h": "c",
-        "timer.h": "c",
-        "sync.h": "c"
-    }
+        "bitmap.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "Enabled"
 }

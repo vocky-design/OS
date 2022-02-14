@@ -79,7 +79,17 @@ struct gdt_desc {
 
 
 
+/* 页表项和页目录项的一些属性定义 */
+#define PG_P_0  0
+#define PG_P_1  1
+#define PG_RW_R 0       //读/执行
+#define PG_RW_W 2       //读/写/执行
+#define PG_US_S 0       //系统级，不允许3特权级
+#define PG_US_U 4       //用户级别，任意特权级
 
+
+/* 杂项 */
+#define DIV_ROUND_UP(X,STEP)    (((X)+(STEP)-1)/(STEP))
 
 
 

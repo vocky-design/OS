@@ -24,7 +24,7 @@ $(BUILD_DIR)/interrupt.o: kernel/interrupt.c kernel/interrupt.h lib/kernel/print
 	$(CC) $(CFLAGS) -o $@ $<
 $(BUILD_DIR)/timer.o: kernel/timer.c kernel/timer.h lib/kernel/io.h lib/kernel/print.h lib/debug.h kernel/thread/thread.h kernel/interrupt.h
 	$(CC) $(CFLAGS) -o $@ $<
-$(BUILD_DIR)/memory.o: kernel/memory.c kernel/memory.h lib/debug.h lib/kernel/print.h lib/kernel/stdint.h lib/kernel/bitmap.h lib/string.h
+$(BUILD_DIR)/memory.o: kernel/memory.c kernel/memory.h lib/debug.h lib/kernel/print.h lib/kernel/stdint.h lib/kernel/bitmap.h lib/string.h kernel/thread/sync.h kernel/thread/thread.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 ##KERNEL/THREAD##
