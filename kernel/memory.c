@@ -40,15 +40,9 @@ static void mem_pool_init(uint32_t all_mem)
 
     kernel_pool.paddr_start = kp_start;
     user_pool.paddr_start = up_start;
-
-    kernel_pool.pool_bitmap.btmp_bytes_len = kbm_length;
-    user_pool.pool_bitmap.btmp_bytes_len = ubm_length;
-    //位图的起始地址
-    kernel_pool.pool_bitmap.bytes = (void *)MEM_BITMAP_BASE;
-    user_pool.pool_bitmap.bytes = (void *)(MEM_BITMAP_BASE + kbm_length);
     
-    bitmap_init(&kernel_pool.pool_bitmap);
-    bitmap_init(&user_pool.pool_bitmap);
+    bitmap_init(&kernel_pool.pool_bitmap, (void *)MEM_BITMAP_BASE, kbm_length);
+    bitmap_init(&user_pool.pool_bitmap, (void *)(MEM_BITMAP_BASE + kbm_length), ubm_length);
     lock_init(&kernel_pool.lock);
     lock_init(&user_pool.lock);
     //输出内存池信息
@@ -63,10 +57,8 @@ static void mem_pool_init(uint32_t all_mem)
     put_int((uint32_t)user_pool.paddr_start);
     put_char('\n');   
 
-    kernel_vaddr_pool.pool_bitmap.bytes = (void *)(MEM_BITMAP_BASE + kbm_length + ubm_length);
-    kernel_vaddr_pool.pool_bitmap.btmp_bytes_len = kbm_length;             //与内核物理地址大小一致
     kernel_vaddr_pool.vaddr_start = K_HEAP_START;
-    bitmap_init(&kernel_vaddr_pool.pool_bitmap);
+    bitmap_init(&kernel_vaddr_pool.pool_bitmap, (void *)(MEM_BITMAP_BASE + kbm_length + ubm_length), kbm_length);
 
     put_str("   mem_pool_init done\n");
 }
@@ -114,14 +106,14 @@ static void *vaddr_get(enum pool_flag pf, uint32_t pg_cnt)
         vaddr_start = kernel_vaddr_pool.vaddr_start + bit_idx_start * PG_SIZE;
     } else {
         struct task_struct *cur_thread = running_thread();
-        bit_idx_start = bitmap_scan(&cur_thread->userprog_vaddr.pool_bitmap, pg_cnt);
+        bit_idx_start = bitmap_scan(&cur_thread->userprog_vaddr_pool.pool_bitmap, pg_cnt);
         if(bit_idx_start == -1) {
             return NULL;
         }
         while(cnt < pg_cnt) {
-            bitmap_set(&cur_thread->userprog_vaddr.pool_bitmap, bit_idx_start+cnt++, 1);
+            bitmap_set(&cur_thread->userprog_vaddr_pool.pool_bitmap, bit_idx_start+cnt++, 1);
         }
-        vaddr_start = cur_thread->userprog_vaddr.vaddr_start + bit_idx_start * PG_SIZE;        
+        vaddr_start = cur_thread->userprog_vaddr_pool.vaddr_start + bit_idx_start * PG_SIZE;        
         //(0xc0000000-PG_SZIE)作为用户3级栈已经在start_process被分配
         ASSERT(vaddr_start < (0xc0000000-PG_SIZE));
     }
@@ -249,10 +241,10 @@ void *get_a_page(enum pool_flag pf, uint32_t vaddr)
     struct task_struct *cur = running_thread();
     int32_t bit_idx = -1;
     if(cur->pgdir != NULL && pf == PF_USER) {
-        bit_idx = (vaddr - cur->userprog_vaddr.vaddr_start) / PG_SIZE;
+        bit_idx = (vaddr - cur->userprog_vaddr_pool.vaddr_start) / PG_SIZE;
         ASSERT(bit_idx > 0);
-        if(!bitmap_bit_test(&cur->userprog_vaddr.pool_bitmap, bit_idx)) {           //此位没有占用
-            bitmap_set(&cur->userprog_vaddr.pool_bitmap, bit_idx, 1);
+        if(!bitmap_bit_test(&cur->userprog_vaddr_pool.pool_bitmap, bit_idx)) {           //此位没有占用
+            bitmap_set(&cur->userprog_vaddr_pool.pool_bitmap, bit_idx, 1);
         } else {
             PANIC("get_a_page: This bit is occupied on the bitmap");
         }

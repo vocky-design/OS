@@ -19,7 +19,5 @@ void create_vaddr_bitmap(struct task_struct *user_prog)
     user_prog->userprog_vaddr_pool.vaddr_start = USER_ADDR_START;
     uint32_t bitmap_bytes_len = (0xc0000000-USER_ADDR_START) / PG_SIZE / 8 ;
     uint32_t bitmap_page_len = DIV_ROUND_UP(bitmap_bytes_len, PG_SIZE);
-    user_prog->userprog_vaddr_pool.pool_bitmap.bytes = get_kernel_pages(bitmap_page_len);
-    user_prog->userprog_vaddr_pool.pool_bitmap.btmp_bytes_len = bitmap_bytes_len;
-    bitmap_init(&user_prog->userprog_vaddr_pool.pool_bitmap);
+    bitmap_init(&user_prog->userprog_vaddr_pool.pool_bitmap, get_kernel_pages(bitmap_page_len), bitmap_bytes_len);
 }

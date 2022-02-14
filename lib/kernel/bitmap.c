@@ -3,8 +3,10 @@
 #include "string.h"
 #include "debug.h"
 
-void bitmap_init(struct bitmap *btmp)
+void bitmap_init(struct bitmap *btmp, void *bytes, uint32_t bytes_len)
 {
+    btmp->bytes = bytes;
+    btmp->btmp_bytes_len = bytes_len;
     memset(btmp->bytes, 0, btmp->btmp_bytes_len);
 }
 /* 判断bit_idx位是否为1，该位有1则返回1，否则返回0 */

@@ -9,7 +9,7 @@ struct bitmap {
     uint8_t *bytes;
 };
 
-void bitmap_init(struct bitmap *btmp);
+void bitmap_init(struct bitmap *btmp, void *bytes, uint32_t bytes_len);
 bool bitmap_bit_test(struct bitmap *btmp, uint32_t bit_idx);
 uint32_t bitmap_scan(struct bitmap *btmp, uint32_t cnt);
 void bitmap_set(struct bitmap *btmp, uint32_t bit_idx, bool value);
