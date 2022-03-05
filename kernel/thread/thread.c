@@ -130,7 +130,7 @@ void schedule(void)
     struct task_struct *next_thread = elem2entry(struct task_struct, general_tag, thread_tag);
     //更新下一个任务的status
     next_thread->status = TASK_RUNNING;
-    //process_activate(next_thread);
+    process_activate(next_thread);
     switch_to(cur_thread, next_thread);
 
 }

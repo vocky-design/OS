@@ -437,131 +437,136 @@ void schedule(void)
     next_thread->status = TASK_RUNNING;
  3b2:	8b 45 ec             	mov    eax,DWORD PTR [ebp-0x14]
  3b5:	c7 40 04 00 00 00 00 	mov    DWORD PTR [eax+0x4],0x0
-    //process_activate(next_thread);
-    switch_to(cur_thread, next_thread);
- 3bc:	83 ec 08             	sub    esp,0x8
+    process_activate(next_thread);
+ 3bc:	83 ec 0c             	sub    esp,0xc
  3bf:	ff 75 ec             	push   DWORD PTR [ebp-0x14]
- 3c2:	ff 75 f4             	push   DWORD PTR [ebp-0xc]
- 3c5:	e8 fc ff ff ff       	call   3c6 <schedule+0xfc>
- 3ca:	83 c4 10             	add    esp,0x10
+ 3c2:	e8 fc ff ff ff       	call   3c3 <schedule+0xf9>
+ 3c7:	83 c4 10             	add    esp,0x10
+    switch_to(cur_thread, next_thread);
+ 3ca:	83 ec 08             	sub    esp,0x8
+ 3cd:	ff 75 ec             	push   DWORD PTR [ebp-0x14]
+ 3d0:	ff 75 f4             	push   DWORD PTR [ebp-0xc]
+ 3d3:	e8 fc ff ff ff       	call   3d4 <schedule+0x10a>
+ 3d8:	83 c4 10             	add    esp,0x10
 
 }
- 3cd:	90                   	nop
- 3ce:	c9                   	leave  
- 3cf:	c3                   	ret    
+ 3db:	90                   	nop
+ 3dc:	c9                   	leave  
+ 3dd:	c3                   	ret    
 
-000003d0 <thread_block>:
+000003de <thread_block>:
 
 //线程阻塞函数
 void thread_block(enum task_status stat)
 {
- 3d0:	55                   	push   ebp
- 3d1:	89 e5                	mov    ebp,esp
- 3d3:	83 ec 18             	sub    esp,0x18
+ 3de:	55                   	push   ebp
+ 3df:	89 e5                	mov    ebp,esp
+ 3e1:	83 ec 18             	sub    esp,0x18
     //对参数的限制
     ASSERT(stat == TASK_BLOCKED || stat == TASK_WAITING || stat == TASK_HANGING);
- 3d6:	83 7d 08 02          	cmp    DWORD PTR [ebp+0x8],0x2
- 3da:	74 28                	je     404 <thread_block+0x34>
- 3dc:	83 7d 08 03          	cmp    DWORD PTR [ebp+0x8],0x3
- 3e0:	74 22                	je     404 <thread_block+0x34>
- 3e2:	83 7d 08 04          	cmp    DWORD PTR [ebp+0x8],0x4
- 3e6:	74 1c                	je     404 <thread_block+0x34>
- 3e8:	68 88 01 00 00       	push   0x188
- 3ed:	68 a8 02 00 00       	push   0x2a8
- 3f2:	68 8e 00 00 00       	push   0x8e
- 3f7:	68 3d 00 00 00       	push   0x3d
- 3fc:	e8 fc ff ff ff       	call   3fd <thread_block+0x2d>
- 401:	83 c4 10             	add    esp,0x10
+ 3e4:	83 7d 08 02          	cmp    DWORD PTR [ebp+0x8],0x2
+ 3e8:	74 28                	je     412 <thread_block+0x34>
+ 3ea:	83 7d 08 03          	cmp    DWORD PTR [ebp+0x8],0x3
+ 3ee:	74 22                	je     412 <thread_block+0x34>
+ 3f0:	83 7d 08 04          	cmp    DWORD PTR [ebp+0x8],0x4
+ 3f4:	74 1c                	je     412 <thread_block+0x34>
+ 3f6:	68 88 01 00 00       	push   0x188
+ 3fb:	68 a8 02 00 00       	push   0x2a8
+ 400:	68 8e 00 00 00       	push   0x8e
+ 405:	68 3d 00 00 00       	push   0x3d
+ 40a:	e8 fc ff ff ff       	call   40b <thread_block+0x2d>
+ 40f:	83 c4 10             	add    esp,0x10
     //关闭中断
-    enum task_status old_status =                                                                                                       intr_disable();
- 404:	e8 fc ff ff ff       	call   405 <thread_block+0x35>
- 409:	89 45 f4             	mov    DWORD PTR [ebp-0xc],eax
+    enum task_status old_status =  intr_disable();                                                                                                       intr_disable();
+ 412:	e8 fc ff ff ff       	call   413 <thread_block+0x35>
+ 417:	89 45 f4             	mov    DWORD PTR [ebp-0xc],eax
+ 41a:	e8 fc ff ff ff       	call   41b <thread_block+0x3d>
     //
     struct task_struct *cur_thread = running_thread();
- 40c:	e8 fc ff ff ff       	call   40d <thread_block+0x3d>
- 411:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
+ 41f:	e8 fc ff ff ff       	call   420 <thread_block+0x42>
+ 424:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
     cur_thread->status = stat;
- 414:	8b 45 f0             	mov    eax,DWORD PTR [ebp-0x10]
- 417:	8b 55 08             	mov    edx,DWORD PTR [ebp+0x8]
- 41a:	89 50 04             	mov    DWORD PTR [eax+0x4],edx
+ 427:	8b 45 f0             	mov    eax,DWORD PTR [ebp-0x10]
+ 42a:	8b 55 08             	mov    edx,DWORD PTR [ebp+0x8]
+ 42d:	89 50 04             	mov    DWORD PTR [eax+0x4],edx
     schedule();
- 41d:	e8 fc ff ff ff       	call   41e <thread_block+0x4e>
+ 430:	e8 fc ff ff ff       	call   431 <thread_block+0x53>
 
     //还原调用环境的中断设置
     intr_set_status(old_status);
- 422:	83 ec 0c             	sub    esp,0xc
- 425:	ff 75 f4             	push   DWORD PTR [ebp-0xc]
- 428:	e8 fc ff ff ff       	call   429 <thread_block+0x59>
- 42d:	83 c4 10             	add    esp,0x10
+ 435:	83 ec 0c             	sub    esp,0xc
+ 438:	ff 75 f4             	push   DWORD PTR [ebp-0xc]
+ 43b:	e8 fc ff ff ff       	call   43c <thread_block+0x5e>
+ 440:	83 c4 10             	add    esp,0x10
 }
- 430:	90                   	nop
- 431:	c9                   	leave  
- 432:	c3                   	ret    
+ 443:	90                   	nop
+ 444:	c9                   	leave  
+ 445:	c3                   	ret    
 
-00000433 <thread_unblock>:
+00000446 <thread_unblock>:
 
 //线程唤醒函数
 void thread_unblock(struct task_struct *pthread)
 {
- 433:	55                   	push   ebp
- 434:	89 e5                	mov    ebp,esp
- 436:	83 ec 18             	sub    esp,0x18
+ 446:	55                   	push   ebp
+ 447:	89 e5                	mov    ebp,esp
+ 449:	83 ec 18             	sub    esp,0x18
     ASSERT(pthread->status == TASK_BLOCKED || pthread->status == TASK_WAITING || pthread->status == TASK_HANGING);
- 439:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
- 43c:	8b 40 04             	mov    eax,DWORD PTR [eax+0x4]
- 43f:	83 f8 02             	cmp    eax,0x2
- 442:	74 32                	je     476 <thread_unblock+0x43>
- 444:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
- 447:	8b 40 04             	mov    eax,DWORD PTR [eax+0x4]
- 44a:	83 f8 03             	cmp    eax,0x3
- 44d:	74 27                	je     476 <thread_unblock+0x43>
- 44f:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
- 452:	8b 40 04             	mov    eax,DWORD PTR [eax+0x4]
- 455:	83 f8 04             	cmp    eax,0x4
- 458:	74 1c                	je     476 <thread_unblock+0x43>
- 45a:	68 d0 01 00 00       	push   0x1d0
- 45f:	68 b8 02 00 00       	push   0x2b8
- 464:	68 9d 00 00 00       	push   0x9d
- 469:	68 3d 00 00 00       	push   0x3d
- 46e:	e8 fc ff ff ff       	call   46f <thread_unblock+0x3c>
- 473:	83 c4 10             	add    esp,0x10
+ 44c:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+ 44f:	8b 40 04             	mov    eax,DWORD PTR [eax+0x4]
+ 452:	83 f8 02             	cmp    eax,0x2
+ 455:	74 32                	je     489 <thread_unblock+0x43>
+ 457:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+ 45a:	8b 40 04             	mov    eax,DWORD PTR [eax+0x4]
+ 45d:	83 f8 03             	cmp    eax,0x3
+ 460:	74 27                	je     489 <thread_unblock+0x43>
+ 462:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+ 465:	8b 40 04             	mov    eax,DWORD PTR [eax+0x4]
+ 468:	83 f8 04             	cmp    eax,0x4
+ 46b:	74 1c                	je     489 <thread_unblock+0x43>
+ 46d:	68 d0 01 00 00       	push   0x1d0
+ 472:	68 b8 02 00 00       	push   0x2b8
+ 477:	68 9d 00 00 00       	push   0x9d
+ 47c:	68 3d 00 00 00       	push   0x3d
+ 481:	e8 fc ff ff ff       	call   482 <thread_unblock+0x3c>
+ 486:	83 c4 10             	add    esp,0x10
     //关闭中断
     enum task_status old_status = intr_disable();  
- 476:	e8 fc ff ff ff       	call   477 <thread_unblock+0x44>
- 47b:	89 45 f4             	mov    DWORD PTR [ebp-0xc],eax
+ 489:	e8 fc ff ff ff       	call   48a <thread_unblock+0x44>
+ 48e:	89 45 f4             	mov    DWORD PTR [ebp-0xc],eax
     ASSERT(elem_find(&thread_ready_list, &pthread->general_tag) == FALSE);
- 47e:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
- 481:	83 c0 30             	add    eax,0x30
- 484:	83 ec 08             	sub    esp,0x8
- 487:	50                   	push   eax
- 488:	68 00 00 00 00       	push   0x0
- 48d:	e8 fc ff ff ff       	call   48e <thread_unblock+0x5b>
- 492:	83 c4 10             	add    esp,0x10
- 495:	85 c0                	test   eax,eax
- 497:	74 1c                	je     4b5 <thread_unblock+0x82>
- 499:	68 38 02 00 00       	push   0x238
- 49e:	68 b8 02 00 00       	push   0x2b8
- 4a3:	68 a0 00 00 00       	push   0xa0
- 4a8:	68 3d 00 00 00       	push   0x3d
- 4ad:	e8 fc ff ff ff       	call   4ae <thread_unblock+0x7b>
- 4b2:	83 c4 10             	add    esp,0x10
+ 491:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+ 494:	83 c0 30             	add    eax,0x30
+ 497:	83 ec 08             	sub    esp,0x8
+ 49a:	50                   	push   eax
+ 49b:	68 00 00 00 00       	push   0x0
+ 4a0:	e8 fc ff ff ff       	call   4a1 <thread_unblock+0x5b>
+ 4a5:	83 c4 10             	add    esp,0x10
+ 4a8:	85 c0                	test   eax,eax
+ 4aa:	74 1c                	je     4c8 <thread_unblock+0x82>
+ 4ac:	68 38 02 00 00       	push   0x238
+ 4b1:	68 b8 02 00 00       	push   0x2b8
+ 4b6:	68 a0 00 00 00       	push   0xa0
+ 4bb:	68 3d 00 00 00       	push   0x3d
+ 4c0:	e8 fc ff ff ff       	call   4c1 <thread_unblock+0x7b>
+ 4c5:	83 c4 10             	add    esp,0x10
     list_push(&thread_ready_list, &pthread->general_tag);
- 4b5:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
- 4b8:	83 c0 30             	add    eax,0x30
- 4bb:	83 ec 08             	sub    esp,0x8
- 4be:	50                   	push   eax
- 4bf:	68 00 00 00 00       	push   0x0
- 4c4:	e8 fc ff ff ff       	call   4c5 <thread_unblock+0x92>
- 4c9:	83 c4 10             	add    esp,0x10
+ 4c8:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+ 4cb:	83 c0 30             	add    eax,0x30
+ 4ce:	83 ec 08             	sub    esp,0x8
+ 4d1:	50                   	push   eax
+ 4d2:	68 00 00 00 00       	push   0x0
+ 4d7:	e8 fc ff ff ff       	call   4d8 <thread_unblock+0x92>
+ 4dc:	83 c4 10             	add    esp,0x10
     pthread->status = TASK_READY;
- 4cc:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
- 4cf:	c7 40 04 01 00 00 00 	mov    DWORD PTR [eax+0x4],0x1
+ 4df:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+ 4e2:	c7 40 04 01 00 00 00 	mov    DWORD PTR [eax+0x4],0x1
     //还原调用环境的中断设置
     intr_set_status(old_status);  
- 4d6:	83 ec 0c             	sub    esp,0xc
- 4d9:	ff 75 f4             	push   DWORD PTR [ebp-0xc]
- 4dc:	e8 fc ff ff ff       	call   4dd <thread_unblock+0xaa>
- 4e1:	83 c4 10             	add    esp,0x10
- 4e4:	90                   	nop
- 4e5:	c9                   	leave  
- 4e6:	c3                   	ret    
+ 4e9:	83 ec 0c             	sub    esp,0xc
+ 4ec:	ff 75 f4             	push   DWORD PTR [ebp-0xc]
+ 4ef:	e8 fc ff ff ff       	call   4f0 <thread_unblock+0xaa>
+ 4f4:	83 c4 10             	add    esp,0x10
+ 4f7:	90                   	nop
+ 4f8:	c9                   	leave  
+ 4f9:	c3                   	ret    

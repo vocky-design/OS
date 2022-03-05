@@ -18,5 +18,5 @@ void init_all(void)
     main_thread_init();     //初始化主线程main的线程环境
     console_init();
     keyboard_init();
-    //tss_init();
+    tss_init();
 }
