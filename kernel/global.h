@@ -32,16 +32,16 @@ struct gdt_desc {
 #define DESC_D_TSS      0
 #define DESC_TYPE_TSS   9
 
-//段描述符属性
+//段描述符字段
 #define GDT_CODE_ATTR_LOW_DPL3 \
         (DESC_P << 7) + (DESC_DPL_3 << 5) + (DESC_S_CODE <<4) + DESC_TYPE_CODE
 #define GDT_DATA_ATTR_LOW_DPL3 \
         (DESC_P << 7) + (DESC_DPL_3 << 5) + (DESC_S_DATA <<4) + DESC_TYPE_DATA
 #define GDT_ATTR_HIGH \
         (DESC_G_4K << 7) + (DESC_D_32 << 6) + (DESC_L << 5) + (DESC_AVL << 4)
-//TSS描述符属性
+//TSS描述符字段
 #define TSS_ATTR_LOW \
-        (DESC_P << 7) + (DESC_DPL_0 << 5) + (DESC_S_SYS <<4) + DESC_TYPE_TSS
+        (DESC_P << 7) + (DESC_DPL_0 << 5) + (DESC_S_SYS << 4) + DESC_TYPE_TSS
 #define TSS_ATTR_HIGH \
         (DESC_G_4K << 7) + (DESC_D_TSS << 6) + (DESC_L << 5) + (DESC_AVL << 4)
 
@@ -76,10 +76,25 @@ struct gdt_desc {
 #define SELECTOR_U_DATA         ((6<<3) + (TI_GDT<<2) + RPL3)
 #define SELECTOR_U_STACK        SELECTOR_U_DATA
 
+/* 页表项和页目录项的一些属性定义 */
+#define PG_P_0  0
+#define PG_P_1  1
+#define PG_RW_R 0       //读/执行
+#define PG_RW_W 2       //读/写/执行
+#define PG_US_S 0       //系统级，不允许3特权级
+#define PG_US_U 4       //用户级别，任意特权级
 
 
 
+/* eflags寄存器字段 */
+#define EFLAGS_MBS      (1 << 1)
+#define EFLAGS_IF_1     (1 << 9)
+#define EFLAGS_IF_0     0
+#define EFLAGS_IOPL_3   (3 << 12)
+#define EFLAGS_IOPL_0   0 
 
+/* 杂项 */
+#define DIV_ROUND_UP(X,STEP)    (((X)+(STEP)-1)/(STEP))
 
 
 

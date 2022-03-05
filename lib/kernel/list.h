@@ -3,15 +3,15 @@
 
 #include "stdint.h"
 
-#define offset(struct_type, member)   (uint32_t)(&((struct_type *)0)->member)   
-#define elem2entry(struct_type, member_name, member_ptr)    (struct_type *)((uint32_t)member_ptr - offset(struct_type, member_name))
+#define offset(struct_type, member)   (int)(&((struct_type *)0)->member)   
+#define elem2entry(struct_type, member_name, member_ptr)    (struct_type *)((int)member_ptr - offset(struct_type, member_name))
 
-/* 链表节点 */
+/* 循环双链表节点 */
 struct list_elem {
     struct list_elem *prev;
     struct list_elem *next;
 };
-/* 链表初始结构 */
+/* 循环双链表初始结构 */
 struct list {
     struct list_elem head;
     struct list_elem tail;

@@ -5,6 +5,7 @@
 
 void bitmap_init(struct bitmap *btmp)
 {
+    //清空位图占用空间
     memset(btmp->bytes, 0, btmp->btmp_bytes_len);
 }
 /* 判断bit_idx位是否为1，该位有1则返回1，否则返回0 */

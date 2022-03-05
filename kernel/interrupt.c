@@ -160,7 +160,7 @@ static void pic_init(void)
     outb(0xa1, 0x02);
     outb(0xa1, 0x01);
     //只打开主片上IR0，也就是目前只接受时钟产生的中断
-    outb(0x21, 0xfd);
+    outb(0x21, 0x00);
     outb(0xa1, 0xff);
 
     put_str("   pic_init done\n");

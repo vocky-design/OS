@@ -11,7 +11,7 @@ static void sema_init(struct semaphore *psema, uint8_t value)
 
 void lock_init(struct lock *plock)
 {
-    sema_init(&plock->semaphore, 1);         
+    sema_init(&plock->semaphore, 1);         //用二元信号量定义锁
     plock->holder = NULL;
     plock->holder_repeat_num = 0;
 }
@@ -19,7 +19,9 @@ void lock_init(struct lock *plock)
 /* 获取锁lock */
 void lock_acquire(struct lock *plock)
 {
-    if(plock->holder != running_thread()) {
+    //如果当前线程不是锁的持有者，或者锁的持有者是NULL。
+    if(running_thread() != plock->holder) {
+        //关中断，保证原子操作
         enum intr_status old_status = intr_disable();
         while(plock->semaphore.value == 0) {            //需要阻塞自己
             ASSERT(elem_find(&plock->semaphore.waiters, &running_thread()->general_tag) == FALSE);

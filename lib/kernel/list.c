@@ -43,6 +43,8 @@ static void list_remove(struct list_elem *elem)
     elem->prev->next = elem->next;
     elem->next->prev = elem->prev;
 
+    //缺少free步骤
+
     intr_set_status(old_status);                                //恢复中断
 }
 

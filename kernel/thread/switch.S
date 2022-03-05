@@ -6,7 +6,7 @@ switch_to:
     push ebx
     push ebp
     mov eax,[esp + 20]
-    mov [eax],esp       ;将栈顶指针esp保存在PCB的self_kstack处
+    mov [eax],esp       ;将当前进程的栈顶指针esp保存在PCB的self_kstack处
 
     ;-----以上是备份当前线程的环境，下面是恢复下一个线程的环境--------
     mov eax,[esp + 24]
