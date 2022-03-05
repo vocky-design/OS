@@ -27,7 +27,16 @@ intr%1entry:
     ;调用中断函数
     push %1             ;不论idt_function中的目标函数是否需要参数，都一律压入中断向量号，调试时很方便。
     call [idt_function + %1*4]
-    add esp,4
+    jmp intr_exit
+
+section .data
+    dd intr%1entry
+%endmacro
+
+section .text
+global intr_exit
+intr_exit: 
+    add esp,4           ;跳过中断号
     ;恢复上下文环境，退出
     popad
     pop gs
@@ -36,10 +45,10 @@ intr%1entry:
     pop ds
     add esp,4           ;跳过error_code
     iret
-section .data
-    dd intr%1entry
-%endmacro
 
+;0-19是处理器内部固定的异常类型
+;20-31是Intel保留的
+;咱们可用的中断向量号最低是32
 VECTOR 0x00,ZERO
 VECTOR 0x01,ZERO
 VECTOR 0x02,ZERO

@@ -13,9 +13,9 @@ section loader vstart=LOADER_BASE_ADDR
 	GDT_SIZE 	equ $-GDT_BASE
 	GDT_LIMIT	equ GDT_SIZE-1
 
-	times 60 dq 0 ;此处预留60个描述符的空位
+	times 60 dq 0 			;此处预留60个描述符的空位
 
-	total_mem_bytes dd 0		;这块地址是0xb00,0x900+(60+4)*8=0xb00
+	total_mem_bytes dd 0	;这块地址是0xb00,0x900+(60+4)*8=0xb00
 
 	SELECTOR_CODE 	equ (0x0001<<3) + TI_GDT + RPL0
 	SELECTOR_DATA 	equ (0x0002<<3) + TI_GDT + RPL0
@@ -56,6 +56,7 @@ loader_start:
 
 	mov byte [gs:176],'r'
 	mov byte [gs:177],0xa4
+
 ;--------------------利用BIOS中断0x15获取物理内存容量-----
 ;1.子功能号:0xe820
 		;---------获取所有ards----------
@@ -128,7 +129,7 @@ loader_start:
 
 ;--------------------进入保护模式-----------------
 ;1.打开A20GATE
-;2.加载gdt
+;2.加载gdt寄存器
 ;3.将CR0的PE位置1
 		;-----------打开A20GATE------------
 	in al,0x92
@@ -164,7 +165,7 @@ p_mode_start:
 ;----------------------------------------------------------
 ;--------------------开启分页机制------------------------------
 ;----------------------------------------------------------
-;1.创建必要的PDE和PTE
+;1.准备必要的PDE和PTE
 	call setup_page
 	;准备好段访问的虚拟地址
 	sgdt [gdt_ptr]
@@ -180,8 +181,9 @@ p_mode_start:
 	or eax,0x80000000
 	mov cr0,eax
 
-;在开启分页后，用gdt新的地址重新加载
+;重新加载GDT寄存器
 	lgdt [gdt_ptr]
+
 	;打印"V"
 	mov byte [gs:480],'V'
 	mov byte [gs:481],0xa4

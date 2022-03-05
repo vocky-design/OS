@@ -2,20 +2,24 @@
 ;主引导程序
 ;--------------------------------------------------------------------------------
 SECTION MBR vstart=0x7c00
-	mov ax,cs
+	mov eax,0
+	mov ebx,0
+	mov ecx,0
+	mov edx,0
+	mov cs,ax		;cs本身也是0  BIOS:jmp 0：0x7c00
 	mov ds,ax
 	mov es,ax
-	mov ss,ax
 	mov fs,ax
+	mov ss,ax
 	mov sp,0x7c00
-	mov ax,0xb800
+	mov ax,0xb800	;gs显存地址
 	mov gs,ax
 
 ;利用0x06号功能，上卷全部行，则可清屏
 ;输入：
 ;AH 功能号= 0x06
 ;AL = 上卷的行数（如果是0,则为全部）
-;BH = 上卷行属性
+;BH = 上卷行属性？？？
 ;(CL,CH) = 窗口左上角的(X,Y)值
 ;(DL,DH) = 窗口右下角的(X,Y)值
 ;无返回值
@@ -55,8 +59,8 @@ SECTION MBR vstart=0x7c00
 ;输入：eax,bx,cl
 rd_disk_m_16:
 ;------------------------------------------------
-	mov esi,eax
 ;第一步：设置要读取的扇区数
+	mov esi,eax
  	mov dx,0x1f2
 	mov al,cl
 	out dx,al

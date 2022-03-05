@@ -1,16 +1,20 @@
 #include "thread.h"
+#include "print.h"
+#include "debug.h"
+#include "string.h"
+#include "interrupt.h"
+
+#include "process.h"
 
 extern void switch_to(struct task_struct *cur_thread, struct task_struct *next_thread);
 
 struct task_struct *main_thread;        //主线程PCB
-struct list thread_ready_list;
-struct list thread_all_list;
 
 /* 获取当前进程PCB指针 */
 struct task_struct *running_thread(void)
 {
     uint32_t esp;
-    asm volatile ("mov %%esp,%0":"=g"(esp));
+    asm volatile ("mov %%esp,%0":"=g"(esp));        //g:表示可以存放到任意地点（寄存器和内存），包括q（eax/ebx/ecx/edx）和内存
     return (struct task_struct *)(esp & 0xfffff000);
 }
 
@@ -24,36 +28,38 @@ static void kernel_thread(thread_func function, void *func_arg)             //??
 }
 
 /* 初始化PCB */
-static void init_thread(struct task_struct *pthread, char *name, int prio)
+void init_thread(struct task_struct *pthread, char *name, int prio)
 {
-    memset(pthread, 0 ,sizeof(struct task_struct));
     if(pthread == main_thread) {
         pthread->status = TASK_RUNNING;
     } else {
         pthread->status = TASK_READY;
     }
-    //将线程栈指针指向PCB页的最高地址
+    //
     pthread->self_kstack = (uint32_t *)((uint32_t)pthread + PG_SIZE);
     strcpy(pthread->name, name);
     pthread->priority = prio;
     pthread->ticks = prio;
     pthread->elapsed_ticks = 0;
     pthread->pgdir = NULL;
-    pthread->stack_magic = 0x19870916;      
+    pthread->stack_magic = 0x19870916;  
+    //后面要分别初始化     uint32_t *pgdir;
+    //                    struct vaddr_pool userprog_vaddr_pool;
+    //                    struct list_elem general_tag;
+    //                    struct list_elem all_list_tag;   
 }
 
-/* 初始化线程栈 */
-static void thread_create(struct task_struct *pthread, thread_func *function, void *func_arg)
+/* 初始化内核线程栈 */
+void thread_create(struct task_struct *pthread, thread_func *function, void *func_arg)
 {
     pthread->self_kstack -= sizeof(struct intr_stack);
     pthread->self_kstack -= sizeof(struct thread_stack);
+    //目前self_kstack指针就更新到了这里
     struct thread_stack *kthread_stack = (struct thread_stack *)pthread->self_kstack;
-    //memset(kthread_stack, 0, sizeof(struct thread_stack));
     kthread_stack->ebp = kthread_stack->ebx = kthread_stack->esi = kthread_stack->edi = 0;
     kthread_stack->eip = kernel_thread;
     kthread_stack->function = function;
     kthread_stack->func_arg = func_arg;
-    
 }
 
 /* 创建线程 */
@@ -85,8 +91,8 @@ static void make_main_thread(void)
     list_append(&thread_all_list, &main_thread->all_list_tag);   
 }
 
-/* 初始化线程环境 */
-void thread_init(void)
+/* 初始化主线程main的线程环境 */
+void main_thread_init(void)
 {
     put_str("thread_init start\n");
     list_init(&thread_ready_list);
@@ -107,7 +113,6 @@ void schedule(void)
     ASSERT(intr_get_status() == INTR_OFF);
 
     struct task_struct *cur_thread = running_thread();
-    ASSERT(cur_thread->status == TASK_RUNNING);             //在没有加入阻塞函数前，暂时添加，
     if(cur_thread->status == TASK_RUNNING) {    //说明是时间片到的情况
         //重新加入READY队列末尾
         ASSERT(elem_find(&thread_ready_list, &cur_thread->general_tag) == FALSE);
@@ -119,12 +124,13 @@ void schedule(void)
         //其他情况调用schedule，进入时status已经不是TASK_RUNNING了。
     }
 
-    //切换
+    //取出下一个任务
     ASSERT(list_empty(&thread_ready_list) == FALSE);
     struct list_elem *thread_tag = list_pop(&thread_ready_list);
     struct task_struct *next_thread = elem2entry(struct task_struct, general_tag, thread_tag);
-    //更新下一个线程的status
+    //更新下一个任务的status
     next_thread->status = TASK_RUNNING;
+    //process_activate(next_thread);
     switch_to(cur_thread, next_thread);
 
 }
@@ -135,7 +141,7 @@ void thread_block(enum task_status stat)
     //对参数的限制
     ASSERT(stat == TASK_BLOCKED || stat == TASK_WAITING || stat == TASK_HANGING);
     //关闭中断
-    enum task_status old_status = intr_disable();
+    enum task_status old_status =  intr_disable();                                                                                                       intr_disable();
     //
     struct task_struct *cur_thread = running_thread();
     cur_thread->status = stat;

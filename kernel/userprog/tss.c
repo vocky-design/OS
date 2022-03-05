@@ -1,13 +1,15 @@
 #include "tss.h"
-
+#include "stdint.h"
+#include "global.h"
+#include "print.h"
 /* 任务段TSS结构 */
 struct tss {
     uint32_t    backlink;
-    uint32_t    esp0;
+    uint32_t    *esp0;
     uint32_t    ss0;
-    uint32_t    esp1;
+    uint32_t    *esp1;
     uint32_t    ss1;
-    uint32_t    esp2;
+    uint32_t    *esp2;
     uint32_t    ss2;
     uint32_t    cr3;
     uint32_t    (*eip)  (void);
@@ -35,7 +37,7 @@ static struct tss tss;
 /* 更新TSS中的esp0字段的值为pthread的0级栈 */
 void update_tss_esp0(struct task_struct *pthread)
 {
-    tss.esp0 = (uint32_t)pthread + PG_SIZE;
+    tss.esp0 = (uint32_t *)((uint32_t)pthread + PG_SIZE);
 }
 
 /* 创建GDT描述符 */
@@ -61,22 +63,22 @@ void tss_init(void)
     put_str("tss_init start\n");
     //创建TSS
     uint32_t tss_size = sizeof(tss);
-    memset((void *)&tss, 0, tss_size);
+    memset(&tss, 0, tss_size);
     tss.ss0 = SELECTOR_K_STACK;
     tss.io_base = tss_size;                  //表示TSS中没有IO位图
 
-    //GDT基址为0x900，把TSS放在第四个，代码段放在第5个，数据段放在第6个
-    *((struct gdt_desc *)0xc0000920) = make_gdt_desc( \
+    //GDT基址为0x900，把TSS放在第四个，代码段放在第5个，数据段放在第6个 //TSS的DPL=0
+    *((struct gdt_desc *)0xc0000920) = make_gdt_desc(\
         (uint32_t)&tss, \
         tss_size-1, \
         TSS_ATTR_LOW, \
         TSS_ATTR_HIGH );
-    *((struct gdt_desc *)0xc0000928) = make_gdt_desc( \
+    *((struct gdt_desc *)0xc0000928) = make_gdt_desc(\
         (uint32_t)0, \
         0xfffff, \
         GDT_CODE_ATTR_LOW_DPL3, \
         GDT_ATTR_HIGH );
-    *((struct gdt_desc *)0xc0000930) = make_gdt_desc( \
+    *((struct gdt_desc *)0xc0000930) = make_gdt_desc(\
         (uint32_t)0, \
         0xfffff, \
         GDT_DATA_ATTR_LOW_DPL3, \
@@ -85,6 +87,6 @@ void tss_init(void)
     //更新GDTR和TR
     uint64_t gdt_operand = ((uint64_t)(uint32_t)0x900 << 16) + ((7 * 8) - 1);
     asm volatile("lgdt %0"::"m"(gdt_operand));
-    asm volatile("ltr %w0"::"r"(SELECTOR_TSS));
+    asm volatile("ltr %w0"::"r"(SELECTOR_TSS));     //存的是TSS选择子
     put_str("tss_init done\n");
 }

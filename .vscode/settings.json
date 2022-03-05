@@ -1,6 +1,10 @@
 {
     "files.associations": {
-        "bitmap.h": "c"
+        "bitmap.h": "c",
+        "thread.h": "c",
+        "interrupt.h": "c",
+        "stdint.h": "c",
+        "memory.h": "c"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }
