@@ -88,6 +88,8 @@ void process_create(void *filename, char *name)
     //1.PCB的基本信息
     struct task_struct *thread = get_kernel_pages(1);           //为PCB表申请一页内核空间
     init_thread(thread, name, default_prio);
+    //
+    block_desc_init(thread->u_block_descs);
     //2.用户进程的虚拟内存池
     create_vaddr_bitmap(thread);
     //3.初始化线程栈

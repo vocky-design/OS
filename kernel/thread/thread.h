@@ -68,6 +68,7 @@ struct task_struct {
     uint32_t elapsed_ticks;                 // 此任务自上CPU运行后至今占用了多少CPU滴答数
     uint32_t *pgdir;                        //进程自己页目录表的虚拟地址
     struct vaddr_pool userprog_vaddr_pool;  //每个用户进程单独管理一个虚拟内存池
+    struct mem_block_desc u_block_descs[DESC_CNT];
     
     struct list_elem general_tag;
     struct list_elem all_list_tag;

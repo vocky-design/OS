@@ -68,15 +68,7 @@ $(BUILD_DIR)/switch.o: kernel/thread/switch.S
 $(BUILD_DIR)/kernel.bin: $(OBJS)	
 	$(LD) $(LDFLAGS) -o $@ $^
 
-.PHONY:	mk_dir hd clean all test
-test:
-	objdump -S -m i386 -M intel $(BUILD_DIR)/process.o   >$(BUILD_DIR)/process.asm
-	objdump -S -m i386 -M intel $(BUILD_DIR)/memory.o    >$(BUILD_DIR)/memory.asm
-	objdump -S -m i386 -M intel $(BUILD_DIR)/interrupt.o >$(BUILD_DIR)/interrupt.asm
-	objdump -S -m i386 -M intel $(BUILD_DIR)/thread.o    >$(BUILD_DIR)/thread.asm
-	objdump -S -m i386 -M intel $(BUILD_DIR)/tss.o    	 >$(BUILD_DIR)/tss.asm
-	objdump -S -m i386 -M intel $(BUILD_DIR)/process.o   >$(BUILD_DIR)/process.asm
-	objdump -S -m i386 -M intel $(BUILD_DIR)/string.o   >$(BUILD_DIR)/string.asm
+.PHONY:	mk_dir hd clean all 
 
 mk_dir:
 	if [ ! -d $(BUILD_DIR) ];then mkdir $(BUILD_DIR);fi
@@ -86,7 +78,7 @@ build: $(BUILD_DIR)/kernel.bin
 hd:
 	dd if=$(BUILD_DIR)/kernel.bin of=$(BOCHS_DIR)/hd60M.img bs=512 count=200 seek=9 conv=notrunc
 
-all: mk_dir build hd test
+all: mk_dir build hd 
 
 clean:
 	cd $(BUILD_DIR) && rm -f ./*

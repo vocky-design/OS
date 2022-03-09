@@ -3,3 +3,5 @@
 
 Ubuntu 16.04 
 bochs 2.6.2
+
+README/images中有重要函数的流程图， 需要在网页draw.io中浏览。
