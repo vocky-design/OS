@@ -79,7 +79,7 @@ struct task_struct *running_thread(void);
 struct task_struct *thread_start(char *name, int prio, thread_func function, void *func_arg);
 void init_thread(struct task_struct *pthread, char *name, int prio);        /* 初始化PCB */
 void thread_create(struct task_struct *pthread, thread_func *function, void *func_arg); ///* 初始化线程栈 */
-void main_thread_init(void);     /* 初始化main的线程环境 */
+void thread_init(void);     /* 初始化main的线程环境 */
 void schedule(void);
 void thread_block(enum task_status stat);
 void thread_unblock(struct task_struct *pthread);

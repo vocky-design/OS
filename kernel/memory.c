@@ -256,19 +256,11 @@ void *get_a_page(enum pool_flag pf, uint32_t vaddr)
     if(cur->pgdir != NULL && pf == PF_USER) {               //当前是用户进程
         bit_idx = (vaddr - cur->userprog_vaddr_pool.vaddr_start) / PG_SIZE;
         ASSERT(bit_idx > 0);
-        if(!bitmap_bit_test(&cur->userprog_vaddr_pool.pool_bitmap, bit_idx)) {           //此位没有占用
-            bitmap_set(&cur->userprog_vaddr_pool.pool_bitmap, bit_idx, 1);
-        } else {
-            PANIC("get_a_page: This bit is occupied on the bitmap");
-        }
+        bitmap_set(&cur->userprog_vaddr_pool.pool_bitmap, bit_idx, 1);
     } else if(cur->pgdir == NULL && pf == PF_KERNEL) {      //当前是内核线程
         bit_idx = (vaddr - kernel_vaddr_pool.vaddr_start) / PG_SIZE;
         ASSERT(bit_idx > 0);
-        if(!bitmap_bit_test(&kernel_vaddr_pool.pool_bitmap, bit_idx)) {
-            bitmap_set(&kernel_vaddr_pool.pool_bitmap, bit_idx, 1);
-        } else {
-            PANIC("get a page: This bit is occupied on the bitmap");
-        }
+        bitmap_set(&kernel_vaddr_pool.pool_bitmap, bit_idx, 1);
     } else {
         PANIC("get_a_page: not allow 'kernel alloc userspace' or 'user alloc kernelspace'");
     }

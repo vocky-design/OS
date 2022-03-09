@@ -43,8 +43,8 @@ intr_exit:
     pop fs
     pop es
     pop ds
-    add esp,4           ;跳过error_code
-    iret
+    add esp,4           ;跳过error_code     
+    iretd
 
 ;0-19是处理器内部固定的异常类型
 ;20-31是Intel保留的

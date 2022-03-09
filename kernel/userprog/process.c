@@ -16,9 +16,9 @@ static void start_process(void *filename_)
     proc_stack->eip = function;
     proc_stack->cs = SELECTOR_U_CODE;
     proc_stack->eflags = EFLAGS_IOPL_0 | EFLAGS_MBS | EFLAGS_IF_1;
-    proc_stack->esp = (void *)((uint32_t)get_a_page(PF_USER, USER_STACK3_VADDR) + PG_SIZE);
+    proc_stack->esp = (void *)((uint32_t)get_a_page(PF_USER, USER_STACK3_VADDR) + PG_SIZE); //其实就是放在虚拟地址0xc0000000 
     proc_stack->ss = SELECTOR_U_STACK;
-    asm volatile("movl %0,%%esp; jmp intr_exit"::"g"(proc_stack):"memory");
+    asm volatile("movl %0,%%esp; jmp intr_exit"::"m"(proc_stack):"memory");
 }
 
 /*
@@ -45,7 +45,7 @@ void process_activate(struct task_struct *pthread)
     ASSERT(pthread != NULL);
     
     uint32_t pdt_phy_addr = 0x100000;
-    if(pthread->pgdir) {                        //用户进程有自己的页目录表
+    if(pthread->pgdir) {        //是用户进程
         pdt_phy_addr = addr_v2p((uint32_t)pthread->pgdir);
     }
     //切换页表

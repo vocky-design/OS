@@ -267,29 +267,29 @@ setup_page:
 	loop .clear_page_dir
 	;开始创建页目录项(PDE)
 	mov eax,PAGE_DIR_TABLE_POS
-	add eax,0x1000
-	mov ebx,eax								;此处为ebx赋值，是为.create_pte做准备，ebx是基址。
+	add eax,0x1000							;eax现在是第一个页表基址
+	mov ebx,eax								;此处为ebx赋值，是为.create_pte做准备，ebx是第一个页表基址。
 
-	or eax,PG_US_U|PG_RW_R|PG_P				;
-	mov [PAGE_DIR_TABLE_POS+0x000*4],eax	;在页目录表第一项，是是第一个页表基址
+	or eax,PG_US_U|PG_RW_W|PG_P				;
+	mov [PAGE_DIR_TABLE_POS+0x000*4],eax	;在页目录表第一项，是是第一个页表基址，一个页表可以管理4MB地址空间
 	mov [PAGE_DIR_TABLE_POS+0x300*4],eax	;在页目录表的OS内存区第一项，是页表基址
-	sub eax,0x1000
+	sub eax,0x1000							;eax现在是页目录表基址
 	mov [PAGE_DIR_TABLE_POS+0x3ff*4],eax	;在页目录表的OS内存区最后一项，是页目录表基址
 	;下面创建低1MB的页表项(PTE)
-	mov ecx,256								;1MB/4KB=256
+	mov ecx,256								;1MB/4KB=256，需要256个页表项
 	mov esi,0
-	mov edx,0|PG_US_U|PG_RW_R|PG_P
+	mov edx, PG_US_U|PG_RW_W|PG_P
 	.create_pte:
 	mov [ebx+esi*4],edx
 	add edx,0x1000							;0x1000:4kb
 	inc esi
 	loop .create_pte
-	;创建虚拟地址内核区其他页表的PDE
+	;创建内核区其他页表的PDE
 	mov eax,PAGE_DIR_TABLE_POS
-	add eax,0x1000*2						;the address of second pte table
-	or 	eax,PG_US_U|PG_RW_R|PG_P
+	add eax,0x1000*2						;此时eax为第二个页表的位置
+	or 	eax,PG_US_U|PG_RW_W|PG_P
 	mov ebx,PAGE_DIR_TABLE_POS
-	mov ecx,254					;范围为第769-1022的所有目录项数量，768和1023有特别用途。
+	mov ecx,254					;范围为第769-1022的所有目录项数量，768和1023已经使用用作特殊用途
 	mov esi,769
 	.create_kernel_pde:
 	mov [ebx+esi*4],eax

@@ -92,7 +92,7 @@ static void make_main_thread(void)
 }
 
 /* 初始化主线程main的线程环境 */
-void main_thread_init(void)
+void thread_init(void)
 {
     put_str("thread_init start\n");
     list_init(&thread_ready_list);

@@ -347,7 +347,7 @@ static void *vaddr_get(enum pool_flag pf, uint32_t pg_cnt)
  30c:	3d ff ef ff bf       	cmp    eax,0xbfffefff
  311:	76 19                	jbe    32c <vaddr_get+0x111>
  313:	68 bc 00 00 00       	push   0xbc
- 318:	68 18 02 00 00       	push   0x218
+ 318:	68 b8 01 00 00       	push   0x1b8
  31d:	6a 7e                	push   0x7e
  31f:	68 e9 00 00 00       	push   0xe9
  324:	e8 fc ff ff ff       	call   325 <vaddr_get+0x10a>
@@ -491,7 +491,7 @@ static void page_table_add(void *_vaddr, void *_paddr)
  417:	85 c0                	test   eax,eax
  419:	74 1c                	je     437 <page_table_add+0x62>
  41b:	68 f9 00 00 00       	push   0xf9
- 420:	68 24 02 00 00       	push   0x224
+ 420:	68 c4 01 00 00       	push   0x1c4
  425:	68 b0 00 00 00       	push   0xb0
  42a:	68 e9 00 00 00       	push   0xe9
  42f:	e8 fc ff ff ff       	call   430 <page_table_add+0x5b>
@@ -522,7 +522,7 @@ static void page_table_add(void *_vaddr, void *_paddr)
         } else {
             PANIC("pte repeat");  
  455:	68 07 01 00 00       	push   0x107
- 45a:	68 24 02 00 00       	push   0x224
+ 45a:	68 c4 01 00 00       	push   0x1c4
  45f:	68 b4 00 00 00       	push   0xb4
  464:	68 e9 00 00 00       	push   0xe9
  469:	e8 fc ff ff ff       	call   46a <page_table_add+0x95>
@@ -567,7 +567,7 @@ static void page_table_add(void *_vaddr, void *_paddr)
  4b6:	85 c0                	test   eax,eax
  4b8:	74 1c                	je     4d6 <page_table_add+0x101>
  4ba:	68 f9 00 00 00       	push   0xf9
- 4bf:	68 24 02 00 00       	push   0x224
+ 4bf:	68 c4 01 00 00       	push   0x1c4
  4c4:	68 ba 00 00 00       	push   0xba
  4c9:	68 e9 00 00 00       	push   0xe9
  4ce:	e8 fc ff ff ff       	call   4cf <page_table_add+0xfa>
@@ -598,7 +598,7 @@ static void *malloc_page(enum pool_flag pf, uint32_t pg_cnt)
  4f2:	81 7d 0c ff 0e 00 00 	cmp    DWORD PTR [ebp+0xc],0xeff
  4f9:	76 1c                	jbe    517 <malloc_page+0x31>
  4fb:	68 12 01 00 00       	push   0x112
- 500:	68 34 02 00 00       	push   0x234
+ 500:	68 d4 01 00 00       	push   0x1d4
  505:	68 c2 00 00 00       	push   0xc2
  50a:	68 e9 00 00 00       	push   0xe9
  50f:	e8 fc ff ff ff       	call   510 <malloc_page+0x2a>
@@ -779,7 +779,7 @@ void *get_a_page(enum pool_flag pf, uint32_t vaddr)
  64f:	85 c0                	test   eax,eax
  651:	74 1c                	je     66f <get_a_page+0x2e>
  653:	68 2d 01 00 00       	push   0x12d
- 658:	68 40 02 00 00       	push   0x240
+ 658:	68 e0 01 00 00       	push   0x1e0
  65d:	68 fa 00 00 00       	push   0xfa
  662:	68 e9 00 00 00       	push   0xe9
  667:	e8 fc ff ff ff       	call   668 <get_a_page+0x27>
@@ -809,214 +809,142 @@ void *get_a_page(enum pool_flag pf, uint32_t vaddr)
  6a6:	8b 45 f0             	mov    eax,DWORD PTR [ebp-0x10]
  6a9:	8b 40 20             	mov    eax,DWORD PTR [eax+0x20]
  6ac:	85 c0                	test   eax,eax
- 6ae:	0f 84 97 00 00 00    	je     74b <get_a_page+0x10a>
- 6b4:	83 7d 08 02          	cmp    DWORD PTR [ebp+0x8],0x2
- 6b8:	0f 85 8d 00 00 00    	jne    74b <get_a_page+0x10a>
+ 6ae:	74 55                	je     705 <get_a_page+0xc4>
+ 6b0:	83 7d 08 02          	cmp    DWORD PTR [ebp+0x8],0x2
+ 6b4:	75 4f                	jne    705 <get_a_page+0xc4>
         bit_idx = (vaddr - cur->userprog_vaddr_pool.vaddr_start) / PG_SIZE;
- 6be:	8b 45 f0             	mov    eax,DWORD PTR [ebp-0x10]
- 6c1:	8b 40 2c             	mov    eax,DWORD PTR [eax+0x2c]
- 6c4:	8b 55 0c             	mov    edx,DWORD PTR [ebp+0xc]
- 6c7:	29 c2                	sub    edx,eax
- 6c9:	89 d0                	mov    eax,edx
- 6cb:	c1 e8 0c             	shr    eax,0xc
- 6ce:	89 45 ec             	mov    DWORD PTR [ebp-0x14],eax
+ 6b6:	8b 45 f0             	mov    eax,DWORD PTR [ebp-0x10]
+ 6b9:	8b 40 2c             	mov    eax,DWORD PTR [eax+0x2c]
+ 6bc:	8b 55 0c             	mov    edx,DWORD PTR [ebp+0xc]
+ 6bf:	29 c2                	sub    edx,eax
+ 6c1:	89 d0                	mov    eax,edx
+ 6c3:	c1 e8 0c             	shr    eax,0xc
+ 6c6:	89 45 ec             	mov    DWORD PTR [ebp-0x14],eax
         ASSERT(bit_idx > 0);
- 6d1:	83 7d ec 00          	cmp    DWORD PTR [ebp-0x14],0x0
- 6d5:	7f 1c                	jg     6f3 <get_a_page+0xb2>
- 6d7:	68 47 01 00 00       	push   0x147
- 6dc:	68 40 02 00 00       	push   0x240
- 6e1:	68 02 01 00 00       	push   0x102
- 6e6:	68 e9 00 00 00       	push   0xe9
- 6eb:	e8 fc ff ff ff       	call   6ec <get_a_page+0xab>
- 6f0:	83 c4 10             	add    esp,0x10
-        if(!bitmap_bit_test(&cur->userprog_vaddr_pool.pool_bitmap, bit_idx)) {           //此位没有占用
- 6f3:	8b 45 ec             	mov    eax,DWORD PTR [ebp-0x14]
- 6f6:	8b 55 f0             	mov    edx,DWORD PTR [ebp-0x10]
- 6f9:	83 c2 24             	add    edx,0x24
- 6fc:	83 ec 08             	sub    esp,0x8
- 6ff:	50                   	push   eax
- 700:	52                   	push   edx
- 701:	e8 fc ff ff ff       	call   702 <get_a_page+0xc1>
- 706:	83 c4 10             	add    esp,0x10
- 709:	85 c0                	test   eax,eax
- 70b:	75 1d                	jne    72a <get_a_page+0xe9>
-            bitmap_set(&cur->userprog_vaddr_pool.pool_bitmap, bit_idx, 1);
- 70d:	8b 45 ec             	mov    eax,DWORD PTR [ebp-0x14]
- 710:	8b 55 f0             	mov    edx,DWORD PTR [ebp-0x10]
- 713:	83 c2 24             	add    edx,0x24
- 716:	83 ec 04             	sub    esp,0x4
- 719:	6a 01                	push   0x1
- 71b:	50                   	push   eax
- 71c:	52                   	push   edx
- 71d:	e8 fc ff ff ff       	call   71e <get_a_page+0xdd>
- 722:	83 c4 10             	add    esp,0x10
-    struct task_struct *cur = running_thread();
-    int32_t bit_idx = -1;
-    if(cur->pgdir != NULL && pf == PF_USER) {               //当前是用户进程
-        bit_idx = (vaddr - cur->userprog_vaddr_pool.vaddr_start) / PG_SIZE;
-        ASSERT(bit_idx > 0);
-        if(!bitmap_bit_test(&cur->userprog_vaddr_pool.pool_bitmap, bit_idx)) {           //此位没有占用
- 725:	e9 d7 00 00 00       	jmp    801 <get_a_page+0x1c0>
-            bitmap_set(&cur->userprog_vaddr_pool.pool_bitmap, bit_idx, 1);
-        } else {
-            PANIC("get_a_page: This bit is occupied on the bitmap");
- 72a:	68 54 01 00 00       	push   0x154
- 72f:	68 40 02 00 00       	push   0x240
- 734:	68 06 01 00 00       	push   0x106
- 739:	68 e9 00 00 00       	push   0xe9
- 73e:	e8 fc ff ff ff       	call   73f <get_a_page+0xfe>
- 743:	83 c4 10             	add    esp,0x10
-    struct task_struct *cur = running_thread();
-    int32_t bit_idx = -1;
-    if(cur->pgdir != NULL && pf == PF_USER) {               //当前是用户进程
-        bit_idx = (vaddr - cur->userprog_vaddr_pool.vaddr_start) / PG_SIZE;
-        ASSERT(bit_idx > 0);
-        if(!bitmap_bit_test(&cur->userprog_vaddr_pool.pool_bitmap, bit_idx)) {           //此位没有占用
- 746:	e9 b6 00 00 00       	jmp    801 <get_a_page+0x1c0>
-            bitmap_set(&cur->userprog_vaddr_pool.pool_bitmap, bit_idx, 1);
-        } else {
-            PANIC("get_a_page: This bit is occupied on the bitmap");
-        }
+ 6c9:	83 7d ec 00          	cmp    DWORD PTR [ebp-0x14],0x0
+ 6cd:	7f 1c                	jg     6eb <get_a_page+0xaa>
+ 6cf:	68 47 01 00 00       	push   0x147
+ 6d4:	68 e0 01 00 00       	push   0x1e0
+ 6d9:	68 02 01 00 00       	push   0x102
+ 6de:	68 e9 00 00 00       	push   0xe9
+ 6e3:	e8 fc ff ff ff       	call   6e4 <get_a_page+0xa3>
+ 6e8:	83 c4 10             	add    esp,0x10
+        bitmap_set(&cur->userprog_vaddr_pool.pool_bitmap, bit_idx, 1);
+ 6eb:	8b 45 ec             	mov    eax,DWORD PTR [ebp-0x14]
+ 6ee:	8b 55 f0             	mov    edx,DWORD PTR [ebp-0x10]
+ 6f1:	83 c2 24             	add    edx,0x24
+ 6f4:	83 ec 04             	sub    esp,0x4
+ 6f7:	6a 01                	push   0x1
+ 6f9:	50                   	push   eax
+ 6fa:	52                   	push   edx
+ 6fb:	e8 fc ff ff ff       	call   6fc <get_a_page+0xbb>
+ 700:	83 c4 10             	add    esp,0x10
+ 703:	eb 78                	jmp    77d <get_a_page+0x13c>
     } else if(cur->pgdir == NULL && pf == PF_KERNEL) {      //当前是内核线程
- 74b:	8b 45 f0             	mov    eax,DWORD PTR [ebp-0x10]
- 74e:	8b 40 20             	mov    eax,DWORD PTR [eax+0x20]
- 751:	85 c0                	test   eax,eax
- 753:	0f 85 8c 00 00 00    	jne    7e5 <get_a_page+0x1a4>
- 759:	83 7d 08 01          	cmp    DWORD PTR [ebp+0x8],0x1
- 75d:	0f 85 82 00 00 00    	jne    7e5 <get_a_page+0x1a4>
+ 705:	8b 45 f0             	mov    eax,DWORD PTR [ebp-0x10]
+ 708:	8b 40 20             	mov    eax,DWORD PTR [eax+0x20]
+ 70b:	85 c0                	test   eax,eax
+ 70d:	75 52                	jne    761 <get_a_page+0x120>
+ 70f:	83 7d 08 01          	cmp    DWORD PTR [ebp+0x8],0x1
+ 713:	75 4c                	jne    761 <get_a_page+0x120>
         bit_idx = (vaddr - kernel_vaddr_pool.vaddr_start) / PG_SIZE;
- 763:	a1 08 00 00 00       	mov    eax,ds:0x8
- 768:	8b 55 0c             	mov    edx,DWORD PTR [ebp+0xc]
- 76b:	29 c2                	sub    edx,eax
- 76d:	89 d0                	mov    eax,edx
- 76f:	c1 e8 0c             	shr    eax,0xc
- 772:	89 45 ec             	mov    DWORD PTR [ebp-0x14],eax
+ 715:	a1 08 00 00 00       	mov    eax,ds:0x8
+ 71a:	8b 55 0c             	mov    edx,DWORD PTR [ebp+0xc]
+ 71d:	29 c2                	sub    edx,eax
+ 71f:	89 d0                	mov    eax,edx
+ 721:	c1 e8 0c             	shr    eax,0xc
+ 724:	89 45 ec             	mov    DWORD PTR [ebp-0x14],eax
         ASSERT(bit_idx > 0);
- 775:	83 7d ec 00          	cmp    DWORD PTR [ebp-0x14],0x0
- 779:	7f 1c                	jg     797 <get_a_page+0x156>
- 77b:	68 47 01 00 00       	push   0x147
- 780:	68 40 02 00 00       	push   0x240
- 785:	68 0a 01 00 00       	push   0x10a
- 78a:	68 e9 00 00 00       	push   0xe9
- 78f:	e8 fc ff ff ff       	call   790 <get_a_page+0x14f>
- 794:	83 c4 10             	add    esp,0x10
-        if(!bitmap_bit_test(&kernel_vaddr_pool.pool_bitmap, bit_idx)) {
- 797:	8b 45 ec             	mov    eax,DWORD PTR [ebp-0x14]
- 79a:	83 ec 08             	sub    esp,0x8
- 79d:	50                   	push   eax
- 79e:	68 00 00 00 00       	push   0x0
- 7a3:	e8 fc ff ff ff       	call   7a4 <get_a_page+0x163>
- 7a8:	83 c4 10             	add    esp,0x10
- 7ab:	85 c0                	test   eax,eax
- 7ad:	75 18                	jne    7c7 <get_a_page+0x186>
-            bitmap_set(&kernel_vaddr_pool.pool_bitmap, bit_idx, 1);
- 7af:	8b 45 ec             	mov    eax,DWORD PTR [ebp-0x14]
- 7b2:	83 ec 04             	sub    esp,0x4
- 7b5:	6a 01                	push   0x1
- 7b7:	50                   	push   eax
- 7b8:	68 00 00 00 00       	push   0x0
- 7bd:	e8 fc ff ff ff       	call   7be <get_a_page+0x17d>
- 7c2:	83 c4 10             	add    esp,0x10
-            PANIC("get_a_page: This bit is occupied on the bitmap");
-        }
-    } else if(cur->pgdir == NULL && pf == PF_KERNEL) {      //当前是内核线程
-        bit_idx = (vaddr - kernel_vaddr_pool.vaddr_start) / PG_SIZE;
-        ASSERT(bit_idx > 0);
-        if(!bitmap_bit_test(&kernel_vaddr_pool.pool_bitmap, bit_idx)) {
- 7c5:	eb 3a                	jmp    801 <get_a_page+0x1c0>
-            bitmap_set(&kernel_vaddr_pool.pool_bitmap, bit_idx, 1);
-        } else {
-            PANIC("get a page: This bit is occupied on the bitmap");
- 7c7:	68 84 01 00 00       	push   0x184
- 7cc:	68 40 02 00 00       	push   0x240
- 7d1:	68 0e 01 00 00       	push   0x10e
- 7d6:	68 e9 00 00 00       	push   0xe9
- 7db:	e8 fc ff ff ff       	call   7dc <get_a_page+0x19b>
- 7e0:	83 c4 10             	add    esp,0x10
-            PANIC("get_a_page: This bit is occupied on the bitmap");
-        }
-    } else if(cur->pgdir == NULL && pf == PF_KERNEL) {      //当前是内核线程
-        bit_idx = (vaddr - kernel_vaddr_pool.vaddr_start) / PG_SIZE;
-        ASSERT(bit_idx > 0);
-        if(!bitmap_bit_test(&kernel_vaddr_pool.pool_bitmap, bit_idx)) {
- 7e3:	eb 1c                	jmp    801 <get_a_page+0x1c0>
-            bitmap_set(&kernel_vaddr_pool.pool_bitmap, bit_idx, 1);
-        } else {
-            PANIC("get a page: This bit is occupied on the bitmap");
-        }
+ 727:	83 7d ec 00          	cmp    DWORD PTR [ebp-0x14],0x0
+ 72b:	7f 1c                	jg     749 <get_a_page+0x108>
+ 72d:	68 47 01 00 00       	push   0x147
+ 732:	68 e0 01 00 00       	push   0x1e0
+ 737:	68 06 01 00 00       	push   0x106
+ 73c:	68 e9 00 00 00       	push   0xe9
+ 741:	e8 fc ff ff ff       	call   742 <get_a_page+0x101>
+ 746:	83 c4 10             	add    esp,0x10
+        bitmap_set(&kernel_vaddr_pool.pool_bitmap, bit_idx, 1);
+ 749:	8b 45 ec             	mov    eax,DWORD PTR [ebp-0x14]
+ 74c:	83 ec 04             	sub    esp,0x4
+ 74f:	6a 01                	push   0x1
+ 751:	50                   	push   eax
+ 752:	68 00 00 00 00       	push   0x0
+ 757:	e8 fc ff ff ff       	call   758 <get_a_page+0x117>
+ 75c:	83 c4 10             	add    esp,0x10
+ 75f:	eb 1c                	jmp    77d <get_a_page+0x13c>
     } else {
         PANIC("get_a_page: not allow 'kernel alloc userspace' or 'user alloc kernelspace'");
- 7e5:	68 b4 01 00 00       	push   0x1b4
- 7ea:	68 40 02 00 00       	push   0x240
- 7ef:	68 11 01 00 00       	push   0x111
- 7f4:	68 e9 00 00 00       	push   0xe9
- 7f9:	e8 fc ff ff ff       	call   7fa <get_a_page+0x1b9>
- 7fe:	83 c4 10             	add    esp,0x10
+ 761:	68 54 01 00 00       	push   0x154
+ 766:	68 e0 01 00 00       	push   0x1e0
+ 76b:	68 09 01 00 00       	push   0x109
+ 770:	68 e9 00 00 00       	push   0xe9
+ 775:	e8 fc ff ff ff       	call   776 <get_a_page+0x135>
+ 77a:	83 c4 10             	add    esp,0x10
     }
     //做好虚拟地址与物理地址的映射
     void *alloced_phyaddr = paddr_get(mem_pool);
- 801:	83 ec 0c             	sub    esp,0xc
- 804:	ff 75 f4             	push   DWORD PTR [ebp-0xc]
- 807:	e8 25 fb ff ff       	call   331 <paddr_get>
- 80c:	83 c4 10             	add    esp,0x10
- 80f:	89 45 e8             	mov    DWORD PTR [ebp-0x18],eax
+ 77d:	83 ec 0c             	sub    esp,0xc
+ 780:	ff 75 f4             	push   DWORD PTR [ebp-0xc]
+ 783:	e8 a9 fb ff ff       	call   331 <paddr_get>
+ 788:	83 c4 10             	add    esp,0x10
+ 78b:	89 45 e8             	mov    DWORD PTR [ebp-0x18],eax
     ASSERT(alloced_phyaddr != NULL);
- 812:	83 7d e8 00          	cmp    DWORD PTR [ebp-0x18],0x0
- 816:	75 1c                	jne    834 <get_a_page+0x1f3>
- 818:	68 ff 01 00 00       	push   0x1ff
- 81d:	68 40 02 00 00       	push   0x240
- 822:	68 15 01 00 00       	push   0x115
- 827:	68 e9 00 00 00       	push   0xe9
- 82c:	e8 fc ff ff ff       	call   82d <get_a_page+0x1ec>
- 831:	83 c4 10             	add    esp,0x10
+ 78e:	83 7d e8 00          	cmp    DWORD PTR [ebp-0x18],0x0
+ 792:	75 1c                	jne    7b0 <get_a_page+0x16f>
+ 794:	68 9f 01 00 00       	push   0x19f
+ 799:	68 e0 01 00 00       	push   0x1e0
+ 79e:	68 0d 01 00 00       	push   0x10d
+ 7a3:	68 e9 00 00 00       	push   0xe9
+ 7a8:	e8 fc ff ff ff       	call   7a9 <get_a_page+0x168>
+ 7ad:	83 c4 10             	add    esp,0x10
     if(alloced_phyaddr == NULL) {
- 834:	83 7d e8 00          	cmp    DWORD PTR [ebp-0x18],0x0
- 838:	75 07                	jne    841 <get_a_page+0x200>
+ 7b0:	83 7d e8 00          	cmp    DWORD PTR [ebp-0x18],0x0
+ 7b4:	75 07                	jne    7bd <get_a_page+0x17c>
         return NULL;
- 83a:	b8 00 00 00 00       	mov    eax,0x0
- 83f:	eb 24                	jmp    865 <get_a_page+0x224>
+ 7b6:	b8 00 00 00 00       	mov    eax,0x0
+ 7bb:	eb 24                	jmp    7e1 <get_a_page+0x1a0>
     }
     page_table_add((void *)vaddr, alloced_phyaddr);
- 841:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
- 844:	83 ec 08             	sub    esp,0x8
- 847:	ff 75 e8             	push   DWORD PTR [ebp-0x18]
- 84a:	50                   	push   eax
- 84b:	e8 85 fb ff ff       	call   3d5 <page_table_add>
- 850:	83 c4 10             	add    esp,0x10
+ 7bd:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+ 7c0:	83 ec 08             	sub    esp,0x8
+ 7c3:	ff 75 e8             	push   DWORD PTR [ebp-0x18]
+ 7c6:	50                   	push   eax
+ 7c7:	e8 09 fc ff ff       	call   3d5 <page_table_add>
+ 7cc:	83 c4 10             	add    esp,0x10
     //
     lock_release(&mem_pool->lock);
- 853:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
- 856:	83 ec 0c             	sub    esp,0xc
- 859:	50                   	push   eax
- 85a:	e8 fc ff ff ff       	call   85b <get_a_page+0x21a>
- 85f:	83 c4 10             	add    esp,0x10
+ 7cf:	8b 45 f4             	mov    eax,DWORD PTR [ebp-0xc]
+ 7d2:	83 ec 0c             	sub    esp,0xc
+ 7d5:	50                   	push   eax
+ 7d6:	e8 fc ff ff ff       	call   7d7 <get_a_page+0x196>
+ 7db:	83 c4 10             	add    esp,0x10
     return (void *)vaddr;
- 862:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+ 7de:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
 }
- 865:	c9                   	leave  
- 866:	c3                   	ret    
+ 7e1:	c9                   	leave  
+ 7e2:	c3                   	ret    
 
-00000867 <addr_v2p>:
+000007e3 <addr_v2p>:
 
 /* 计算虚拟地址映射到的物理地址 */
 uint32_t addr_v2p(uint32_t vaddr)
 {
- 867:	55                   	push   ebp
- 868:	89 e5                	mov    ebp,esp
- 86a:	83 ec 10             	sub    esp,0x10
+ 7e3:	55                   	push   ebp
+ 7e4:	89 e5                	mov    ebp,esp
+ 7e6:	83 ec 10             	sub    esp,0x10
     uint32_t *pte = pte_ptr(vaddr);
- 86d:	ff 75 08             	push   DWORD PTR [ebp+0x8]
- 870:	e8 fc ff ff ff       	call   871 <addr_v2p+0xa>
- 875:	83 c4 04             	add    esp,0x4
- 878:	89 45 fc             	mov    DWORD PTR [ebp-0x4],eax
+ 7e9:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+ 7ec:	e8 fc ff ff ff       	call   7ed <addr_v2p+0xa>
+ 7f1:	83 c4 04             	add    esp,0x4
+ 7f4:	89 45 fc             	mov    DWORD PTR [ebp-0x4],eax
     return (*pte & 0xfffff000) + (vaddr & 0x00000fff);
- 87b:	8b 45 fc             	mov    eax,DWORD PTR [ebp-0x4]
- 87e:	8b 00                	mov    eax,DWORD PTR [eax]
- 880:	25 00 f0 ff ff       	and    eax,0xfffff000
- 885:	89 c2                	mov    edx,eax
- 887:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
- 88a:	25 ff 0f 00 00       	and    eax,0xfff
- 88f:	01 d0                	add    eax,edx
+ 7f7:	8b 45 fc             	mov    eax,DWORD PTR [ebp-0x4]
+ 7fa:	8b 00                	mov    eax,DWORD PTR [eax]
+ 7fc:	25 00 f0 ff ff       	and    eax,0xfffff000
+ 801:	89 c2                	mov    edx,eax
+ 803:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+ 806:	25 ff 0f 00 00       	and    eax,0xfff
+ 80b:	01 d0                	add    eax,edx
 }
- 891:	c9                   	leave  
- 892:	c3                   	ret    
+ 80d:	c9                   	leave  
+ 80e:	c3                   	ret    

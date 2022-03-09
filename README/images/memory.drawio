@@ -1,49 +1,10 @@
-<mxfile host="app.diagrams.net" modified="2022-03-05T13:46:17.671Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36 Edg/98.0.1108.62" etag="4bGbhJqlmGx5FNpOoXpg" version="16.6.5" type="github">
-  <diagram id="n1LJ-ZPiGX7DN0U7caab" name="Page-1">
-    <mxGraphModel dx="1038" dy="539" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
-      <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-        <mxCell id="A3nt19TFvrYsIKU3Zn_V-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;jumpStyle=none;endSize=6;arcSize=20;" parent="1" source="A3nt19TFvrYsIKU3Zn_V-1" target="A3nt19TFvrYsIKU3Zn_V-2" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="A3nt19TFvrYsIKU3Zn_V-1" value="开始" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.start_1;whiteSpace=wrap;" parent="1" vertex="1">
-          <mxGeometry x="150" y="30" width="100" height="60" as="geometry" />
-        </mxCell>
-        <mxCell id="A3nt19TFvrYsIKU3Zn_V-6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;jumpStyle=none;jumpSize=2;orthogonalLoop=1;jettySize=auto;html=1;endSize=6;strokeWidth=1;" parent="1" source="A3nt19TFvrYsIKU3Zn_V-2" target="A3nt19TFvrYsIKU3Zn_V-5" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="A3nt19TFvrYsIKU3Zn_V-2" value="获取物理池的锁" style="whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="140" y="150" width="120" height="60" as="geometry" />
-        </mxCell>
-        <mxCell id="A3nt19TFvrYsIKU3Zn_V-8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;jumpStyle=none;jumpSize=2;orthogonalLoop=1;jettySize=auto;html=1;endSize=6;strokeWidth=1;" parent="1" source="A3nt19TFvrYsIKU3Zn_V-5" target="A3nt19TFvrYsIKU3Zn_V-7" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="A3nt19TFvrYsIKU3Zn_V-5" value="设置虚拟池的位图" style="whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="140" y="290" width="120" height="60" as="geometry" />
-        </mxCell>
-        <mxCell id="A3nt19TFvrYsIKU3Zn_V-10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;jumpStyle=none;jumpSize=2;orthogonalLoop=1;jettySize=auto;html=1;endSize=6;strokeWidth=1;" parent="1" source="A3nt19TFvrYsIKU3Zn_V-7" target="A3nt19TFvrYsIKU3Zn_V-9" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="A3nt19TFvrYsIKU3Zn_V-7" value="申请物理地址" style="whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="140" y="430" width="120" height="60" as="geometry" />
-        </mxCell>
-        <mxCell id="A3nt19TFvrYsIKU3Zn_V-12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;jumpStyle=none;jumpSize=2;orthogonalLoop=1;jettySize=auto;html=1;endSize=6;strokeWidth=1;" parent="1" source="A3nt19TFvrYsIKU3Zn_V-9" target="A3nt19TFvrYsIKU3Zn_V-11" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="A3nt19TFvrYsIKU3Zn_V-9" value="建立物理地址与虚拟地址的映射关系" style="whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="140" y="570" width="120" height="60" as="geometry" />
-        </mxCell>
-        <mxCell id="A3nt19TFvrYsIKU3Zn_V-14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;jumpStyle=none;jumpSize=2;orthogonalLoop=1;jettySize=auto;html=1;endSize=6;strokeWidth=1;" parent="1" source="A3nt19TFvrYsIKU3Zn_V-11" target="A3nt19TFvrYsIKU3Zn_V-13" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="A3nt19TFvrYsIKU3Zn_V-11" value="解除物理池的锁" style="whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="140" y="710" width="120" height="60" as="geometry" />
-        </mxCell>
-        <mxCell id="A3nt19TFvrYsIKU3Zn_V-13" value="结束" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="140" y="850" width="120" height="60" as="geometry" />
-        </mxCell>
-      </root>
-    </mxGraphModel>
-  </diagram>
+<mxfile host="65bd71144e">
+    <diagram id="n1LJ-ZPiGX7DN0U7caab" name="Page-1">
+        <mxGraphModel dx="690" dy="567" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+            </root>
+        </mxGraphModel>
+    </diagram>
 </mxfile>
