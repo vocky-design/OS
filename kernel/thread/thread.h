@@ -1,8 +1,8 @@
 #ifndef _KERNEL_THREAD_H
 #define _KERNEL_THREAD_H
-#include "stdint.h"
+#include "global.h"
 #include "memory.h"
-#include "list.h"
+
 /* 自定义通用函数类型 */
 typedef void thread_func(void *);
 

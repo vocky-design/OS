@@ -2,10 +2,6 @@
 #define _KERNEL_USERPROG_PROCESS_H
 
 #include "global.h"
-#include "stdint.h"
-#include "console.h"
-#include "debug.h"
-#include "string.h"
 #include "memory.h"
 #include "thread.h"
 #include "tss.h"

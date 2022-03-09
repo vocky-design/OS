@@ -4,7 +4,10 @@
         "thread.h": "c",
         "interrupt.h": "c",
         "stdint.h": "c",
-        "memory.h": "c"
+        "memory.h": "c",
+        "print.h": "c",
+        "string.h": "c",
+        "global.h": "c"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }

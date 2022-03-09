@@ -1,13 +1,7 @@
 #ifndef  _KERNEL_MEMORY_H
 #define  _KERNEL_MEMORY_H
 #include "global.h"
-#include "stdint.h"
-#include "debug.h"
-#include "print.h"
-#include "string.h"
-#include "bitmap.h"
 #include "sync.h"
-#include "list.h"
 
 /* 虚拟地址池，用于虚拟地址管理 */
 struct vaddr_pool {

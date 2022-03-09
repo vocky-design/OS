@@ -2,7 +2,12 @@
 #define _KERNEL_GLOBAL_H
 
 #include "stdint.h"
-
+#include "print.h"
+#include "debug.h"
+#include "console.h"
+#include "string.h"
+#include "bitmap.h"
+#include "list.h"
 #define PG_SIZE 4096
 
 /* GDT描述符的结构 */

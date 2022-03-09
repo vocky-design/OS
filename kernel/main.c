@@ -1,12 +1,9 @@
-#include "stdint.h"
-#include "print.h"
-#include "debug.h"
 #include "init.h"
 #include "interrupt.h"
 #include "memory.h"
 #include "thread.h"
 #include "process.h"
-#include "console.h"
+
 
 //void u_prog_a(void);
 //void u_prog_b(void);

@@ -1,8 +1,7 @@
 #ifndef _KERNEL_THREAD_SYNC_H
 #define _KERNEL_THREAD_SYNC_H
 
-#include "list.h"
-#include "stdint.h"
+#include "global.h"
 
 /* 信号量结构 */
 struct semaphore

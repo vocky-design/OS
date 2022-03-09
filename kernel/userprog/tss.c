@@ -1,7 +1,5 @@
 #include "tss.h"
-#include "stdint.h"
-#include "global.h"
-#include "print.h"
+
 /* 任务段TSS结构 */
 struct tss {
     uint32_t    backlink;

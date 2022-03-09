@@ -1,6 +1,7 @@
 #ifndef _KERNEL_INTERRUPT_H
 #define _KERNEL_INTERRUPT_H
-
+#include "global.h"
+#include "io.h"
 typedef void* intr_handler;
 
 //定义eflags中断标志位IF的两种状态

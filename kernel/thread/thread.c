@@ -1,9 +1,5 @@
 #include "thread.h"
-#include "print.h"
-#include "debug.h"
-#include "string.h"
 #include "interrupt.h"
-
 #include "process.h"
 
 extern void switch_to(struct task_struct *cur_thread, struct task_struct *next_thread);

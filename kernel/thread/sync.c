@@ -1,6 +1,5 @@
 #include "sync.h"
 #include "thread.h"
-#include "debug.h"
 #include "interrupt.h"
 
 static void sema_init(struct semaphore *psema, uint8_t value)
