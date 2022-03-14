@@ -17,7 +17,7 @@ int main(void)
 	//process_create(u_prog_a, "u_prog_a");
 	//process_create(u_prog_b, "u_prog_b");
 	thread_start("k_a", 32, k_a, NULL);
-	thread_start("k_a", 32, k_b, NULL);
+	thread_start("k_b", 32, k_b, NULL);
 	intr_enable();						//确保中断打开，任务调度器开始工作
 	while(1) {
 		//console_put_str("Main ");
@@ -25,36 +25,30 @@ int main(void)
 	}
 	return 0;
 }
+
 void k_a(void *args)
 {
-	void *addr = sys_malloc(33);
-	console_put_str("I am thread_a, sys_malloc(33), addr is 0x");
-	console_put_int((uint32_t)addr);
-	console_put_char('\n');
+	console_put_str("thread_a start\n");
+	int max = 100;
+	while(max--) {
+		void *addr1 = sys_malloc(1024);
+		void *addr2 = sys_malloc(1024);
+		sys_free(addr1);
+		sys_free(addr2);
+	}
+	console_put_str("thread_a end\n");
 	while(1);
 }
 void k_b(void *args)
 {
-	void *addr = sys_malloc(63);
-	console_put_str("I am thread_a, sys_malloc(63), addr is 0x");
-	console_put_int((uint32_t)addr);
-	console_put_char('\n');
+	console_put_str("thread_b start\n");
+	int max = 100;
+	while(max--) {
+		void *addr1 = sys_malloc(2048);
+		void *addr2 = sys_malloc(2048);
+		sys_free(addr1);
+		sys_free(addr2);
+	}
+	console_put_str("thread_b end\n");
 	while(1);
 }
-
-/*
-void u_prog_a(void)
-{
-	while(1) {
-		put_str("uprog_A");
-		//console_put_str("uprog_A");
-	}
-}
-void u_prog_b(void)
-{
-	while(1) {
-		put_str("uprog_B");
-		//console_put_str("uprog_B");
-	}
-}
-*/

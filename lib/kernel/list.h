@@ -26,6 +26,7 @@ uint32_t list_len(struct list *list);
 void list_push(struct list *list, struct list_elem *elem);
 void list_append(struct list *list, struct list_elem *elem);
 struct list_elem *list_pop(struct list *list);
+void list_remove(struct list_elem *elem);
 bool elem_find(struct list *list, struct list_elem *obj_elem);
 struct list_elem *list_traversal(struct list *list, traversal_func func, int arg);
 
