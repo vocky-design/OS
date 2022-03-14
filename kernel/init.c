@@ -15,8 +15,8 @@ void init_all(void)
     idt_init();
     timer_init();
     mem_init();             //建立并初始化内存池
-    main_thread_init();     //初始化主线程main的线程环境
+    thread_init();          //初始化线程环境
     console_init();
     keyboard_init();
-    //tss_init();
+    tss_init();
 }

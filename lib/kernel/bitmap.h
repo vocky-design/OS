@@ -1,7 +1,6 @@
 #ifndef  _LIB_KERNEL_BITMAP_H
 #define  _LIB_KERNEL_BITMAP_H
-
-#include "stdint.h"
+#include "global.h"
 
 /* 位图数据结构的定义 */
 struct bitmap {

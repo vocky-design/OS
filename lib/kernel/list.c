@@ -36,7 +36,7 @@ void list_append(struct list *list, struct list_elem *elem)
 }
 
 /* 使元素elem脱离链表 */
-static void list_remove(struct list_elem *elem)
+void list_remove(struct list_elem *elem)
 {
     enum intr_status old_status =  intr_disable();             //关闭中断
 

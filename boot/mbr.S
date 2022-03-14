@@ -2,11 +2,10 @@
 ;主引导程序
 ;--------------------------------------------------------------------------------
 SECTION MBR vstart=0x7c00
-	mov eax,0
-	mov ebx,0
-	mov ecx,0
-	mov edx,0
-	mov cs,ax		;cs本身也是0  BIOS:jmp 0：0x7c00
+	mov ax,cs
+	mov bx,ax
+	mov cx,ax
+	mov dx,ax
 	mov ds,ax
 	mov es,ax
 	mov fs,ax

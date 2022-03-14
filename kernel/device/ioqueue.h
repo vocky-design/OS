@@ -1,9 +1,10 @@
 #ifndef _KERNEL_DEVICE_IOQUEUE_H
 #define _KERNEL_DEVICE_IOQUEUE_H
 
-#include "stdint.h"
+#include "global.h"
 #include "thread.h"
 #include "sync.h"
+#include "interrupt.h"
 
 #define bufsize 64
 

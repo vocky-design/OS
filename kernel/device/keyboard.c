@@ -1,6 +1,5 @@
 #include "keyboard.h"
-#include "stdint.h"
-#include "print.h"
+#include "global.h"
 #include "io.h"
 #include "interrupt.h"
 #include "ioqueue.h"

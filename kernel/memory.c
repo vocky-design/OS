@@ -1,5 +1,6 @@
 #include "memory.h"
 #include "thread.h"
+#include "interrupt.h"
 
 #define PG_SIZE                 4096
 #define MEM_BITMAP_BASE       0xc009a000  //1个物理块的PCB+4个物理块的位图
@@ -18,6 +19,7 @@ struct paddr_pool {
 };
 struct paddr_pool kernel_pool, user_pool;
 struct vaddr_pool kernel_vaddr_pool;
+struct mem_block_desc k_block_descs[DESC_CNT];
 
 static void mem_pool_init(uint32_t all_mem)
 {
@@ -65,10 +67,22 @@ static void mem_pool_init(uint32_t all_mem)
 
     kernel_vaddr_pool.vaddr_start = K_HEAP_START;
     kernel_vaddr_pool.pool_bitmap.bytes = (uint8_t *)(MEM_BITMAP_BASE + kbm_length + ubm_length);
-    kernel_vaddr_pool.pool_bitmap.btmp_bytes_len = kbm_length;
+    kernel_vaddr_pool.pool_bitmap.btmp_bytes_len = (0x40000000 - 0x800000) / PG_SIZE / 8;
     bitmap_init(&kernel_vaddr_pool.pool_bitmap);
 
     put_str("   mem_pool_init done\n");
+}
+
+void block_desc_init(struct mem_block_desc *desc_array)
+{
+    uint32_t block_size = 16;
+    for(int i=0; i<DESC_CNT; ++i) {
+        desc_array[i].block_size = block_size;
+        desc_array[i].blocks_per_arena = (PG_SIZE-sizeof(struct arena)) / block_size;
+        list_init(&desc_array[i].free_list);
+
+        block_size *= 2;
+    }
 }
 
 void mem_init(void) 
@@ -76,29 +90,10 @@ void mem_init(void)
     put_str("mem_init start\n");
     uint32_t mem_bytes_total = (*(uint32_t *)0xb00);
     mem_pool_init(mem_bytes_total);
+    block_desc_init(k_block_descs);
     put_str("mem_init done\n");
 }
 
-/* 申请cnt个虚拟内存块，成功返回虚拟起始地址，失败返回NULL 
-   因为虚拟地址分配是连续的，所以一次申请多个*/
-/*static void *vaddr_get(enum pool_flag pf, uint32_t cnt)
-{
-    uint32_t vaddr_start;
-    if(pf == PF_KERNEL) {
-        int32_t bit_idx = bitmap_scan(&kernel_vaddr_pool.pool_bitmap, cnt);
-        if(bit_idx != -1) {
-            while(cnt--) {
-                bitmap_set(&kernel_vaddr_pool.pool_bitmap, bit_idx+cnt-1, 1);
-            }
-            vaddr_start = kernel_vaddr_pool.vaddr_start + bit_idx * PG_SIZE;
-        } else {    
-            return NULL;
-        }
-    } else {
-        //用户虚拟空间，后面写。
-    }
-    return (void *)vaddr_start;
-}*/
 static void *vaddr_get(enum pool_flag pf, uint32_t pg_cnt)
 {
     int vaddr_start = 0, bit_idx_start = -1;
@@ -136,22 +131,10 @@ static void *paddr_get(struct paddr_pool *m_pool)
         return NULL;
     }
     bitmap_set(&m_pool->pool_bitmap, bit_idx, 1);
-    uint32_t paddr_start = m_pool->paddr_start + bit_idx * PG_SIZE;
-    return (void *)paddr_start;
+    uint32_t paddr_alloc = m_pool->paddr_start + bit_idx * PG_SIZE;
+    return (void *)paddr_alloc;
 }
 
-/* 得到虚拟地址vaddr对应的pde指针 */
-/*uint32_t *pde_ptr(uint32_t vaddr)
-{
-    uint32_t *pde = (uint32_t *)(0xfffff000 + ((0xffc00000 & vaddr) >> 20));
-    return pde;
-}*/
-/* 得到虚拟地址vaddr对应的pte指针 */
-/*uint32_t *pte_ptr(uint32_t vaddr)
-{
-    uint32_t *pte = (uint32_t *)(0xffc00000 + ((0xffc00000 & vaddr) >> 10) + ((0x003ff000 & vaddr) >> 10));
-    return pte;
-}*/
 uint32_t *pde_ptr(uint32_t vaddr)
 {
     uint32_t *pde = (uint32_t *)(0xfffff000 + PDE_IDX(vaddr)*4);
@@ -166,8 +149,8 @@ uint32_t *pte_ptr(uint32_t vaddr)
 /* 页表中添加虚拟地址_vaddr与物理地址_paddr的映射 */
 static void page_table_add(void *_vaddr, void *_paddr)
 {
-    uint32_t vaddr = (uint32_t)(uint32_t *)_vaddr;
-    uint32_t paddr = (uint32_t)(uint32_t *)_paddr;
+    uint32_t vaddr = (uint32_t)_vaddr;
+    uint32_t paddr = (uint32_t)_paddr;
 
     uint32_t *pde = pde_ptr(vaddr);
     uint32_t *pte = pte_ptr(vaddr); 
@@ -180,7 +163,7 @@ static void page_table_add(void *_vaddr, void *_paddr)
             PANIC("pte repeat");  
         }
     } else {
-        uint32_t pte_paddr = (uint32_t)(uint32_t *)paddr_get(&kernel_pool);       //为页表申请空间
+        uint32_t pte_paddr = (uint32_t)paddr_get(&kernel_pool);       //为二级页表申请空间
         *pde = pte_paddr | PG_US_U | PG_RW_W | PG_P_1;
         memset((void *)((uint32_t)pte & 0xfffff000), 0, PG_SIZE);               //清空页表，要用虚拟地址访问刚申请的页表        
         ASSERT(!(*pte & 0x1));  
@@ -256,19 +239,11 @@ void *get_a_page(enum pool_flag pf, uint32_t vaddr)
     if(cur->pgdir != NULL && pf == PF_USER) {               //当前是用户进程
         bit_idx = (vaddr - cur->userprog_vaddr_pool.vaddr_start) / PG_SIZE;
         ASSERT(bit_idx > 0);
-        if(!bitmap_bit_test(&cur->userprog_vaddr_pool.pool_bitmap, bit_idx)) {           //此位没有占用
-            bitmap_set(&cur->userprog_vaddr_pool.pool_bitmap, bit_idx, 1);
-        } else {
-            PANIC("get_a_page: This bit is occupied on the bitmap");
-        }
+        bitmap_set(&cur->userprog_vaddr_pool.pool_bitmap, bit_idx, 1);
     } else if(cur->pgdir == NULL && pf == PF_KERNEL) {      //当前是内核线程
         bit_idx = (vaddr - kernel_vaddr_pool.vaddr_start) / PG_SIZE;
         ASSERT(bit_idx > 0);
-        if(!bitmap_bit_test(&kernel_vaddr_pool.pool_bitmap, bit_idx)) {
-            bitmap_set(&kernel_vaddr_pool.pool_bitmap, bit_idx, 1);
-        } else {
-            PANIC("get a page: This bit is occupied on the bitmap");
-        }
+        bitmap_set(&kernel_vaddr_pool.pool_bitmap, bit_idx, 1);
     } else {
         PANIC("get_a_page: not allow 'kernel alloc userspace' or 'user alloc kernelspace'");
     }
@@ -289,4 +264,214 @@ uint32_t addr_v2p(uint32_t vaddr)
 {
     uint32_t *pte = pte_ptr(vaddr);
     return (*pte & 0xfffff000) + (vaddr & 0x00000fff);
+}
+
+/* 返回arena中第idx个内存块的地址 */
+
+static struct mem_block *arena2block(struct arena *a, uint32_t idx)
+{
+    return (struct mem_block *)((uint32_t)(a+1) + idx * a->desc->block_size);
+}
+/* 返回管理mem_block的arena */
+static struct arena *block2arena(struct mem_block *b) 
+{
+    return (struct arena *)((uint32_t)b & 0xfffff000);
+}
+
+/* 在堆中申请size个字节的内存 */
+void *sys_malloc(uint32_t size)
+{
+    enum pool_flag PF;
+    struct paddr_pool *mem_pool;    
+    struct mem_block_desc *desc;
+    struct task_struct *cur_thread = running_thread();
+    /* 判断用哪个内存池 */
+    if(cur_thread->pgdir == NULL) {         //是内核线程
+        PF = PF_KERNEL;
+        mem_pool = &kernel_pool;
+        desc = k_block_descs;
+    } else {
+        PF = PF_USER;
+        mem_pool = &user_pool;
+        desc = cur_thread->u_block_descs;
+    }
+
+    ASSERT(size > 0 && size < mem_pool->pool_size);
+
+    struct arena *a;
+    struct mem_block *b;
+
+    lock_acquire(&mem_pool->lock);
+    if(size > 1024) {   //属于大内存分配的逻辑
+        uint32_t page_cnt = DIV_ROUND_UP(size + sizeof(struct arena), PG_SIZE);
+        a = malloc_page(PF, page_cnt);
+        if(a == NULL) {
+            lock_release(&mem_pool->lock);
+            return NULL;
+        }
+        memset(a, 0, page_cnt * PG_SIZE);
+
+        a->desc = NULL;
+        a->large = TRUE;
+        a->cnt = page_cnt;
+
+        lock_release(&mem_pool->lock);
+        return (void *)(a+1);
+
+    } else {
+        /* 确定应该申请哪种规格的内存块 */
+        uint32_t desc_idx = 0;
+        for(; desc_idx < DESC_CNT; ++desc_idx) {
+            if(size <= desc[desc_idx].block_size) {
+                break;
+            }
+        }
+        /* 检查free_list是否空 */
+        if(list_empty(&desc[desc_idx].free_list)) {
+            /* 申请一页 */
+            a = malloc_page(PF, 1);
+            ASSERT(a != NULL);
+            if(a == NULL) {
+                lock_release(&mem_pool->lock);
+                return NULL;
+            }
+            memset(a, 0, PG_SIZE);
+            /* 配置struct arena */
+            a->desc = &desc[desc_idx];
+            a->large = FALSE;
+            a->cnt = a->desc->blocks_per_arena;
+            /* 内存分割，分配 */
+            enum intr_status old_status = intr_disable();
+            for(int i=0; i < a->desc->blocks_per_arena; ++i) {
+                b = arena2block(a, i);
+                ASSERT(!elem_find(&a->desc->free_list, &b->free_elem));
+                list_append(&a->desc->free_list, &b->free_elem);
+            }
+            intr_set_status(old_status);
+        }
+        /* 开始分配内存块*/
+        b = elem2entry(struct mem_block, free_elem, list_pop(&(desc[desc_idx].free_list)));
+        memset(b, 0, desc[desc_idx].block_size);
+        a= block2arena(b);
+        a->cnt--;
+        lock_release(&mem_pool->lock);
+        return (void *)b;
+    }
+}
+
+/* 将物理地址paddr回收到物理内存池 */
+static void paddr_pool_free(uint32_t paddr)
+{
+    struct paddr_pool *mem_pool;
+    uint32_t bit_idx;
+    if(paddr >= user_pool.paddr_start) {
+        mem_pool = &user_pool;
+        bit_idx = (paddr - mem_pool->paddr_start) / PG_SIZE;
+    } else {
+        mem_pool = &kernel_pool;
+        bit_idx = (paddr - mem_pool->paddr_start) / PG_SIZE;
+    }
+
+    bitmap_set(&mem_pool->pool_bitmap, bit_idx, 0);
+}
+
+/* 去掉页表中虚拟地址vaddr的映射，只是去掉vaddr对应的pte */
+static void pte_remove(uint32_t vaddr)
+{
+    uint32_t *pte = pte_ptr(vaddr);
+    *pte &= ~PG_P_1;
+    asm volatile("invlpg %0"::"m"(vaddr):"memory");
+}
+
+/* 将vaddr起始的pg_cnt个虚拟页回收到虚拟内存池 */
+static void vaddr_pool_free(enum pool_flag pf, void *_vaddr, uint32_t pg_cnt)
+{
+    uint32_t vaddr = (uint32_t)_vaddr;
+    struct vaddr_pool *mem_pool;
+    uint32_t bit_idx_start;
+    if(pf == PF_USER) {
+        mem_pool = &running_thread()->userprog_vaddr_pool;
+        bit_idx_start = (vaddr - mem_pool->vaddr_start) / PG_SIZE;
+    } else {
+        mem_pool = &kernel_vaddr_pool;
+        bit_idx_start = (vaddr - mem_pool->vaddr_start) / PG_SIZE;
+    }
+//TODO 为什么会出现回收bit不为1的情况？
+    //ASSERT(bitmap_bit_test(&mem_pool->pool_bitmap, bit_idx));
+    for(int i=0; i<pg_cnt; ++i) {
+        ASSERT(bitmap_bit_test(&mem_pool->pool_bitmap, bit_idx_start + i));
+        bitmap_set(&mem_pool->pool_bitmap, bit_idx_start + i, 0);
+    }
+}
+
+/* 以页框为单位释放内存 */
+static void mfree_page(enum pool_flag pf, void*_vaddr, uint32_t pg_cnt)
+{
+    uint32_t vaddr = (uint32_t)_vaddr;
+    ASSERT(pg_cnt >= 1 && (vaddr & 0x00000fff) == 0);
+    uint32_t paddr = addr_v2p(vaddr);
+    ASSERT(paddr % PG_SIZE == 0 && paddr >= 0x102000);
+
+    if(pf == PF_USER) {
+        vaddr -= PG_SIZE;
+        for(int i=0; i<pg_cnt; ++i) {
+            vaddr += PG_SIZE;
+            paddr = addr_v2p(vaddr);
+            ASSERT(paddr % PG_SIZE == 0 && paddr >= user_pool.paddr_start);
+            paddr_pool_free(paddr);
+            pte_remove(vaddr);           
+        }
+        vaddr_pool_free(pf, _vaddr, pg_cnt);
+    } else {
+        vaddr -= PG_SIZE;
+        for(int i=0; i<pg_cnt; ++i) {
+            vaddr += PG_SIZE;
+            paddr = addr_v2p(vaddr);
+            ASSERT(paddr % PG_SIZE == 0 && \
+                    paddr >= kernel_pool.paddr_start && \
+                    paddr < user_pool.paddr_start);
+            paddr_pool_free(paddr);
+            pte_remove(vaddr);           
+        }
+        vaddr_pool_free(pf, _vaddr, pg_cnt);
+    }
+}
+
+/* 任意大小内存回收 */
+void sys_free(void *ptr)
+{
+    ASSERT(ptr != NULL);
+
+    enum pool_flag pf;
+    struct paddr_pool *mem_pool;
+    if(running_thread()->pgdir == NULL) {       //属于内核线程
+        pf = PF_KERNEL;
+        mem_pool = &kernel_pool;
+    } else {
+        pf = PF_USER;
+        mem_pool = &user_pool;
+    }
+
+    lock_acquire(&mem_pool->lock);
+    struct mem_block *b = (struct mem_block *)ptr;
+    struct arena *a = block2arena(b);
+    ASSERT(((uint32_t)b - (uint32_t)a - sizeof(*a)) % a->desc->block_size == 0 );
+    ASSERT(a->large == TRUE || a->large == FALSE);
+    if(a->desc == NULL && a->large == TRUE) {       //是大内存回收
+        mfree_page(pf, a, a->cnt);
+    } else {
+        list_append(&a->desc->free_list, &b->free_elem);
+        a->cnt++;
+        /* 再判断此arena中的内存块是否都是空闲，如果是就释放arena */
+        if(a->cnt == a->desc->blocks_per_arena) {
+            for(int i=0; i<a->desc->blocks_per_arena; ++i) {
+                struct mem_block *b = arena2block(a, i);
+                ASSERT(elem_find(&a->desc->free_list, &b->free_elem));
+                list_remove(&b->free_elem);
+            }
+            mfree_page(pf, a, 1);
+        }
+        
+    }
+    lock_release(&mem_pool->lock);
 }

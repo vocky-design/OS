@@ -1,7 +1,7 @@
 #ifndef _KERNEL_DEVICE_CONSOLE_H
 #define _KERNEL_DEVICE_CONSOLE_H
 
-#include "stdint.h"
+#include "global.h"
 
 void console_init(void);
 void console_put_str(char *str);

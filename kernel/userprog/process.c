@@ -16,9 +16,9 @@ static void start_process(void *filename_)
     proc_stack->eip = function;
     proc_stack->cs = SELECTOR_U_CODE;
     proc_stack->eflags = EFLAGS_IOPL_0 | EFLAGS_MBS | EFLAGS_IF_1;
-    proc_stack->esp = (void *)((uint32_t)get_a_page(PF_USER, USER_STACK3_VADDR) + PG_SIZE);
+    proc_stack->esp = (void *)((uint32_t)get_a_page(PF_USER, USER_STACK3_VADDR) + PG_SIZE); //其实就是放在虚拟地址0xc0000000 
     proc_stack->ss = SELECTOR_U_STACK;
-    asm volatile("movl %0,%%esp; jmp intr_exit"::"g"(proc_stack):"memory");
+    asm volatile("movl %0,%%esp; jmp intr_exit"::"m"(proc_stack):"memory");
 }
 
 /*
@@ -45,7 +45,7 @@ void process_activate(struct task_struct *pthread)
     ASSERT(pthread != NULL);
     
     uint32_t pdt_phy_addr = 0x100000;
-    if(pthread->pgdir) {                        //用户进程有自己的页目录表
+    if(pthread->pgdir) {        //是用户进程
         pdt_phy_addr = addr_v2p((uint32_t)pthread->pgdir);
     }
     //切换页表
@@ -76,7 +76,7 @@ static uint32_t *create_pdt(void)
 static void create_vaddr_bitmap(struct task_struct *user_prog)
 {
     user_prog->userprog_vaddr_pool.vaddr_start = USER_VADDR_START;
-    uint32_t bitmap_bytes_len = (0xc0000000-USER_VADDR_START) / PG_SIZE / 8 ;
+    uint32_t bitmap_bytes_len = (0xc0000000-PG_SIZE-USER_VADDR_START) / PG_SIZE / 8 ;
     uint32_t bitmap_page_len = DIV_ROUND_UP(bitmap_bytes_len, PG_SIZE);
     user_prog->userprog_vaddr_pool.pool_bitmap.bytes = (uint8_t *)get_kernel_pages(bitmap_page_len);
     user_prog->userprog_vaddr_pool.pool_bitmap.btmp_bytes_len = bitmap_bytes_len;
@@ -88,6 +88,8 @@ void process_create(void *filename, char *name)
     //1.PCB的基本信息
     struct task_struct *thread = get_kernel_pages(1);           //为PCB表申请一页内核空间
     init_thread(thread, name, default_prio);
+    //
+    block_desc_init(thread->u_block_descs);
     //2.用户进程的虚拟内存池
     create_vaddr_bitmap(thread);
     //3.初始化线程栈

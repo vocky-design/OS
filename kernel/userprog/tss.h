@@ -1,5 +1,7 @@
 #ifndef _KERNEL_USERPROG_TSS_H
 #define _KERNEL_USERPROG_TSS_H
+
+#include "global.h"
 #include "thread.h"
 
 void update_tss_esp0(struct task_struct *pthread);

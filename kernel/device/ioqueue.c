@@ -1,6 +1,4 @@
 #include "ioqueue.h"
-#include "debug.h"
-#include "interrupt.h"
 
 void ioqueue_init(struct ioqueue *ioq)
 {

@@ -1,6 +1,5 @@
 #include "sync.h"
 #include "thread.h"
-#include "debug.h"
 #include "interrupt.h"
 
 static void sema_init(struct semaphore *psema, uint8_t value)
@@ -19,15 +18,17 @@ void lock_init(struct lock *plock)
 /* 获取锁lock */
 void lock_acquire(struct lock *plock)
 {
-    //如果当前线程不是锁的持有者，或者锁的持有者是NULL。
-    if(running_thread() != plock->holder) {
+    if(running_thread() == plock->holder) {
+        plock->holder_repeat_num++;
+    } else {
         //关中断，保证原子操作
         enum intr_status old_status = intr_disable();
-        while(plock->semaphore.value == 0) {            //需要阻塞自己
+        while(plock->semaphore.value == 0) {            //无可用信号量，请阻塞当前线程
             ASSERT(elem_find(&plock->semaphore.waiters, &running_thread()->general_tag) == FALSE);
             list_append(&plock->semaphore.waiters, &running_thread()->general_tag);
             thread_block(TASK_BLOCKED);
-        }       
+        }      
+        //如value为1或被唤醒后 
         plock->semaphore.value--;
         ASSERT(plock->semaphore.value == 0);            //因为这是二元信号量
         intr_set_status(old_status);
@@ -35,8 +36,6 @@ void lock_acquire(struct lock *plock)
         plock->holder = running_thread();
         ASSERT(plock->holder_repeat_num == 0);          //因为这是线程刚获得锁
         plock->holder_repeat_num = 1;
-    } else {
-        plock->holder_repeat_num++;
     }
 }
 
@@ -53,6 +52,7 @@ void lock_release(struct lock *plock)
 
     plock->holder = NULL;
     plock->holder_repeat_num = 0;
+    
     enum intr_status old_status = intr_disable();
     ASSERT(plock->semaphore.value == 0);                //因为这是二元信号量
     if(list_empty(&plock->semaphore.waiters) == FALSE) {

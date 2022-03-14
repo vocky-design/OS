@@ -2,6 +2,13 @@
 #define _KERNEL_GLOBAL_H
 
 #include "stdint.h"
+#include "print.h"
+#include "debug.h"
+#include "console.h"
+#include "string.h"
+#include "bitmap.h"
+#include "list.h"
+#define PG_SIZE 4096
 
 /* GDT描述符的结构 */
 struct gdt_desc {
@@ -78,19 +85,19 @@ struct gdt_desc {
 
 /* 页表项和页目录项的一些属性定义 */
 #define PG_P_0  0
-#define PG_P_1  1
+#define PG_P_1  0x1
 #define PG_RW_R 0       //读/执行
-#define PG_RW_W 2       //读/写/执行
+#define PG_RW_W 0x2       //读/写/执行
 #define PG_US_S 0       //系统级，不允许3特权级
-#define PG_US_U 4       //用户级别，任意特权级
+#define PG_US_U 0x4       //用户级别，任意特权级
 
 
 
 /* eflags寄存器字段 */
-#define EFLAGS_MBS      (1 << 1)
+#define EFLAGS_MBS      (1 << 1)                //此项必须要设置？？？
 #define EFLAGS_IF_1     (1 << 9)
 #define EFLAGS_IF_0     0
-#define EFLAGS_IOPL_3   (3 << 12)
+#define EFLAGS_IOPL_3   (3 << 12)               //IOPL3，用于测试用户程序在非系统调用下进行IO
 #define EFLAGS_IOPL_0   0 
 
 /* 杂项 */

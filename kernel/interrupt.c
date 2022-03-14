@@ -1,8 +1,4 @@
-#include "stdint.h"
 #include "interrupt.h"
-#include "global.h"
-#include "print.h"
-#include "io.h"
 
 #define IDT_DESC_CNT    0x30
 #define EFLAGS_IF       0x00000200

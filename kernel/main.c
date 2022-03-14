@@ -1,46 +1,54 @@
-#include "stdint.h"
-#include "print.h"
-#include "debug.h"
 #include "init.h"
 #include "interrupt.h"
 #include "memory.h"
 #include "thread.h"
 #include "process.h"
-#include "console.h"
 
-void k_thread_a(void *arg);
-void k_thread_b(void *arg);
 
+//void u_prog_a(void);
+//void u_prog_b(void);
+void k_a(void *args);
+void k_b(void *args);
 int main(void)
 {
 	put_str("i am kernel\n");
 	init_all();
-	//新建线程
-	thread_start("k_thread_a", 31, k_thread_a, "argA ");
-	thread_start("k_thread_b", 31, k_thread_b, "argB ");
-	uint32_t len = list_len(&thread_ready_list);
-	console_put_int(len);
+
+	//process_create(u_prog_a, "u_prog_a");
+	//process_create(u_prog_b, "u_prog_b");
+	thread_start("k_a", 32, k_a, NULL);
+	thread_start("k_b", 32, k_b, NULL);
 	intr_enable();						//确保中断打开，任务调度器开始工作
 	while(1) {
 		//console_put_str("Main ");
-		put_str("Main ");
+		//put_str("Main ");
 	}
 	return 0;
 }
 
-
-void k_thread_a(void *arg)
+void k_a(void *args)
 {
-	while(1){
-		//console_put_str("A ");
-		put_str("A ");
+	console_put_str("thread_a start\n");
+	int max = 100;
+	while(max--) {
+		void *addr1 = sys_malloc(1024);
+		void *addr2 = sys_malloc(1024);
+		sys_free(addr1);
+		sys_free(addr2);
 	}
+	console_put_str("thread_a end\n");
+	while(1);
 }
-
-void k_thread_b(void *arg)
+void k_b(void *args)
 {
-	while(1) {
-		//console_put_str("B ");
-		put_str("B ");
+	console_put_str("thread_b start\n");
+	int max = 100;
+	while(max--) {
+		void *addr1 = sys_malloc(2048);
+		void *addr2 = sys_malloc(2048);
+		sys_free(addr1);
+		sys_free(addr2);
 	}
+	console_put_str("thread_b end\n");
+	while(1);
 }

@@ -1,7 +1,4 @@
 #include "bitmap.h"
-#include "stdint.h"
-#include "string.h"
-#include "debug.h"
 
 void bitmap_init(struct bitmap *btmp)
 {
@@ -35,7 +32,7 @@ uint32_t bitmap_scan(struct bitmap *btmp, uint32_t cnt)
     }
     uint32_t bit_idx_start = byte_idx * 8 + i;
     if(cnt == 1) {
-        return (uint32_t)bit_idx_start;
+        return bit_idx_start;
     }
     uint32_t bit_left = btmp->btmp_bytes_len * 8 - bit_idx_start;
     uint32_t next_bit_idx = bit_idx_start + 1;

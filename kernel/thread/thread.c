@@ -1,9 +1,5 @@
 #include "thread.h"
-#include "print.h"
-#include "debug.h"
-#include "string.h"
 #include "interrupt.h"
-
 #include "process.h"
 
 extern void switch_to(struct task_struct *cur_thread, struct task_struct *next_thread);
@@ -92,7 +88,7 @@ static void make_main_thread(void)
 }
 
 /* 初始化主线程main的线程环境 */
-void main_thread_init(void)
+void thread_init(void)
 {
     put_str("thread_init start\n");
     list_init(&thread_ready_list);
@@ -130,7 +126,7 @@ void schedule(void)
     struct task_struct *next_thread = elem2entry(struct task_struct, general_tag, thread_tag);
     //更新下一个任务的status
     next_thread->status = TASK_RUNNING;
-    //process_activate(next_thread);
+    process_activate(next_thread);
     switch_to(cur_thread, next_thread);
 
 }
