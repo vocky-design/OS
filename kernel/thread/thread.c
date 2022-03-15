@@ -6,6 +6,19 @@ extern void switch_to(struct task_struct *cur_thread, struct task_struct *next_t
 
 struct task_struct *main_thread;        //主线程PCB
 
+struct lock pid_lock;                   //pid唯一，分配pid时需互斥
+
+/* 分配pid */
+static int16_t allocte_pid(void)
+{
+    static int16_t next_pid = 0;
+    lock_acquire(&pid_lock);
+    next_pid++;
+    int16_t temp_pid = next_pid;
+    lock_release(&pid_lock);
+    return temp_pid;
+}
+
 /* 获取当前进程PCB指针 */
 struct task_struct *running_thread(void)
 {
@@ -34,6 +47,7 @@ void init_thread(struct task_struct *pthread, char *name, int prio)
     //
     pthread->self_kstack = (uint32_t *)((uint32_t)pthread + PG_SIZE);
     strcpy(pthread->name, name);
+    pthread->pid = allocte_pid();
     pthread->priority = prio;
     pthread->ticks = prio;
     pthread->elapsed_ticks = 0;
@@ -87,12 +101,13 @@ static void make_main_thread(void)
     list_append(&thread_all_list, &main_thread->all_list_tag);   
 }
 
-/* 初始化主线程main的线程环境 */
+/* 初始化线程环境 */
 void thread_init(void)
 {
     put_str("thread_init start\n");
     list_init(&thread_ready_list);
     list_init(&thread_all_list);
+    lock_init(&pid_lock);
     //初始化main的PCB，并挂载到总队列中
     make_main_thread();
     put_str("thread_init done\n");

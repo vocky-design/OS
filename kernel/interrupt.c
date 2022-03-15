@@ -1,6 +1,6 @@
 #include "interrupt.h"
 
-#define IDT_DESC_CNT    0x30
+#define IDT_DESC_CNT    0x81
 #define EFLAGS_IF       0x00000200
 #define GET_EFLAGS(eflags)      asm volatile ("pushfl; popl %0":"=m"(eflags))
 
@@ -16,7 +16,7 @@ static struct gate_desc IDT[IDT_DESC_CNT];
 char* intr_name[IDT_DESC_CNT];              //和下面的函数地址是联系的。
 intr_handler idt_function[IDT_DESC_CNT];
 extern intr_handler intr_entry_table[IDT_DESC_CNT];
-
+extern void syscall_handler(void);
 /* 获取IF标志位状态 */
 enum intr_status intr_get_status(void)
 {
@@ -139,6 +139,8 @@ static void idt_desc_init(void)
     for(int i=0; i<IDT_DESC_CNT; ++i) {
         make_idt_desc(&IDT[i],(uint8_t)IDT_DESC_ATTR_DPL0,intr_entry_table[i]);
     }
+    //单独处理系统调用，系统调用对应的中断门DPL为3，中断处理程序为单独的syscall_handler
+    make_idt_desc(&IDT[0x80], (uint8_t)IDT_DESC_DPL3, syscall_handler);
     put_str("   idt_desc_init done\n");
 }
 

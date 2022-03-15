@@ -33,7 +33,35 @@ section .data
     dd intr%1entry
 %endmacro
 
+
+
+
+;;;;;;;;;;;;;;;0x80号中断，专门用于处理系统调用;;;;;;;;;;;;;;;;;;;;;;
+extern syscall_table
 section .text
+global syscall_handler
+syscall_handler:
+    push 0
+
+    push ds 
+    push es
+    push fs
+    push gs
+    pushad 
+
+    push 0x80
+
+    ;为系统调用子功能传入参数
+    push edx    
+    push ecx
+    push ebx 
+    ;调用子功能处理函数
+    call [syscall_table + eax*4]
+    add esp,12
+    ;返回
+    mov [esp + 8*4],eax
+    jmp intr_exit
+
 global intr_exit
 intr_exit: 
     add esp,4           ;跳过中断号

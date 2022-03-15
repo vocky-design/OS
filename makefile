@@ -4,7 +4,7 @@ LD = ld
 BUILD_DIR = ./build
 BOCHS_DIR = ./bochs
 ENTRY_POINT = 0xc0001500
-LIB = -I lib/ -I lib/kernel/ -I kernel/ -I kernel/thread/ -I kernel/device/ -I kernel/userprog/
+LIB = -I lib/ -I lib/kernel/ -I lib/usr/ -I kernel/ -I kernel/thread/ -I kernel/device/ -I kernel/userprog/
 ASFLAGS = -f elf32
 CFLAGS  = -g -m32 $(LIB) -fno-builtin -fno-stack-protector -Wall -Wstrict-prototypes -Wmissing-prototypes -c
 LDFLAGS = -m elf_i386 -Ttext $(ENTRY_POINT) -e main
@@ -12,6 +12,7 @@ OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/init.o $(BUILD_DIR)/interrupt.o $(BUILD_
 	$(BUILD_DIR)/kernel.o $(BUILD_DIR)/print.o $(BUILD_DIR)/debug.o $(BUILD_DIR)/string.o $(BUILD_DIR)/bitmap.o \
 	$(BUILD_DIR)/memory.o $(BUILD_DIR)/thread.o $(BUILD_DIR)/list.o $(BUILD_DIR)/switch.o $(BUILD_DIR)/sync.o   \
 	$(BUILD_DIR)/console.o $(BUILD_DIR)/keyboard.o $(BUILD_DIR)/ioqueue.o $(BUILD_DIR)/tss.o $(BUILD_DIR)/process.o \
+ 	$(BUILD_DIR)/syscall-init.o $(BUILD_DIR)/syscall.o
 ####################### C编译 #######################################
 ##KERNEL##
 $(BUILD_DIR)/main.o: kernel/main.c kernel/global.h kernel/init.h kernel/interrupt.h  \
@@ -64,6 +65,10 @@ $(BUILD_DIR)/process.o: kernel/userprog/process.c kernel/global.h \
 kernel/memory.h kernel/thread/thread.h kernel/userprog/tss.h kernel/interrupt.h
 	$(CC) $(CFLAGS) -o $@ $<
 
+$(BUILD_DIR)/syscall-init.o: kernel/userprog/syscall-init.c kernel/global.h kernel/thread/thread.h \
+lib/usr/syscall.h
+	$(CC) $(CFLAGS) -o $@ $<
+
 ##LIB##
 $(BUILD_DIR)/bitmap.o: lib/kernel/bitmap.c kernel/global.h
 	$(CC) $(CFLAGS) -o $@ $<
@@ -75,6 +80,9 @@ $(BUILD_DIR)/string.o: lib/string.c lib/kernel/stdint.h lib/debug.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(BUILD_DIR)/debug.o: lib/debug.c lib/kernel/print.h kernel/interrupt.h
+	$(CC) $(CFLAGS) -o $@ $<
+
+$(BUILD_DIR)/syscall.o: lib/usr/syscall.c lib/kernel/stdint.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 ####################### NASM编译 #######################################
