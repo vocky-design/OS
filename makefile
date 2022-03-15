@@ -66,10 +66,7 @@ kernel/memory.h kernel/thread/thread.h kernel/userprog/tss.h kernel/interrupt.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(BUILD_DIR)/syscall-init.o: kernel/userprog/syscall-init.c kernel/global.h kernel/thread/thread.h \
-<<<<<<< HEAD
-=======
-lib/uer/syscall.h
->>>>>>> 003db3805aa82043c5678e1d069b07c57d39020e
+lib/usr/syscall.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 ##LIB##
@@ -85,11 +82,7 @@ $(BUILD_DIR)/string.o: lib/string.c lib/kernel/stdint.h lib/debug.h
 $(BUILD_DIR)/debug.o: lib/debug.c lib/kernel/print.h kernel/interrupt.h
 	$(CC) $(CFLAGS) -o $@ $<
 
-<<<<<<< HEAD
 $(BUILD_DIR)/syscall.o: lib/usr/syscall.c lib/kernel/stdint.h
-=======
-$(BUILD_DIR)/syscall.o: lib/uer/syscall.c lib/kernel/stdint.h
->>>>>>> 003db3805aa82043c5678e1d069b07c57d39020e
 	$(CC) $(CFLAGS) -o $@ $<
 
 ####################### NASM编译 #######################################
