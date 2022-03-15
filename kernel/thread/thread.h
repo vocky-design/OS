@@ -63,6 +63,7 @@ struct task_struct {
     uint32_t *self_kstack;
     enum task_status status;
     char name[16];
+    uint16_t pid;
     uint8_t priority;
     uint8_t ticks;
     uint32_t elapsed_ticks;                 // 此任务自上CPU运行后至今占用了多少CPU滴答数
