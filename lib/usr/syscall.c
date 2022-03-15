@@ -1,5 +1,9 @@
 #include "syscall.h"
-
+<<<<<<< HEAD
+#include "stdint.h"
+=======
+#include "stdint.h"
+>>>>>>> 003db3805aa82043c5678e1d069b07c57d39020e
 /* 无参数的系统调用 */
 #define _syscall0(NUMBER) ({                \
     int retval;                             \
