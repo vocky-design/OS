@@ -6,3 +6,4 @@ bochs/hd60M.img
 *.o
 *.out
 build/*.asm
+.vscode/**
