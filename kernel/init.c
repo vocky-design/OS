@@ -21,3 +21,4 @@ void init_all(void)
     keyboard_init();
     tss_init();
     syscall_init();
+}
