@@ -12,7 +12,10 @@ OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/init.o $(BUILD_DIR)/interrupt.o $(BUILD_
 	$(BUILD_DIR)/kernel.o $(BUILD_DIR)/print.o $(BUILD_DIR)/debug.o $(BUILD_DIR)/string.o $(BUILD_DIR)/bitmap.o \
 	$(BUILD_DIR)/memory.o $(BUILD_DIR)/thread.o $(BUILD_DIR)/list.o $(BUILD_DIR)/switch.o $(BUILD_DIR)/sync.o   \
 	$(BUILD_DIR)/console.o $(BUILD_DIR)/keyboard.o $(BUILD_DIR)/ioqueue.o $(BUILD_DIR)/tss.o $(BUILD_DIR)/process.o \
+<<<<<<< HEAD
  	$(BUILD_DIR)/syscall-init.o $(BUILD_DIR)/syscall.o
+=======
+>>>>>>> 2bc1b919ec8b42dbaa29946045813fe89d9074e5
 ####################### C编译 #######################################
 ##KERNEL##
 $(BUILD_DIR)/main.o: kernel/main.c kernel/global.h kernel/init.h kernel/interrupt.h  \

@@ -101,6 +101,7 @@ static void make_main_thread(void)
     list_append(&thread_all_list, &main_thread->all_list_tag);   
 }
 
+
 /* 初始化线程环境 */
 void thread_init(void)
 {
