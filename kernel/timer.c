@@ -1,8 +1,6 @@
 #include "timer.h"
-#include "io.h"
-#include "thread.h"
-#include "interrupt.h"
 
+#define mil_seconds_per_intr    (1000 / IRQ0_FREQUENCY)     //1s = 1000ms
 uint32_t ticks = 0;             //记录内核自中断开启以来总共的滴答数
 
 static void timer_set(uint8_t port, uint8_t control_value, uint16_t counter_value)
@@ -26,6 +24,22 @@ static void intr_timer_handler(void)
     } else {
         cur_thread->ticks--;
     }
+}
+
+/* 以ticks为单位的sleep */
+static void ticks_to_sleep(uint32_t sleep_ticks)
+{
+    uint32_t ticks_start = ticks;
+    while(ticks - ticks_start < sleep_ticks) {
+        thread_yield();
+    }
+}
+/* 以ms为单位的sleep */
+void mtime_sleep(uint32_t m_seconds)
+{
+    uint32_t sleep_ticks = DIV_ROUND_UP(m_seconds, mil_seconds_per_intr);
+    ASSERT(sleep_ticks > 0);
+    ticks_to_sleep(sleep_ticks);
 }
 
 void timer_init(void)
