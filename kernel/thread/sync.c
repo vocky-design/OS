@@ -2,10 +2,39 @@
 #include "thread.h"
 #include "interrupt.h"
 
-static void sema_init(struct semaphore *psema, uint8_t value)
+void sema_init(struct semaphore *psema, uint8_t value)
 {
     psema->value = value;
     list_init(&psema->waiters);
+}
+
+void sema_down(struct semaphore *psema)
+{
+    //关中断，保证原子操作
+    enum intr_status old_status = intr_disable();
+
+    while(psema->value == 0) {
+        //当前线程不应该在信号量的waiters队列中
+        ASSERT(!elem_find(&psema->waiters, &running_thread()->general_tag));
+        //把当前线程加入到waiters中
+        list_append(&psema->waiters, &running_thread()->general_tag);
+        thread_block(TASK_BLOCKED);
+    }
+    //此刻，阻塞进程已经被唤醒
+    psema->value--;
+    intr_set_status(old_status);
+}
+
+void sema_up(struct semaphore *psema)
+{
+    //关中断，保证原子操作
+    enum intr_status old_status = intr_disable();
+    if(!list_empty(&psema->waiters)) {
+        struct task_struct *thread_blocked = elem2entry(struct task_struct, general_tag, list_pop(&psema->waiters));
+        thread_unblock(thread_blocked);
+    }
+    psema->value++;
+    intr_set_status(old_status);
 }
 
 void lock_init(struct lock *plock)
@@ -21,18 +50,7 @@ void lock_acquire(struct lock *plock)
     if(running_thread() == plock->holder) {
         plock->holder_repeat_num++;
     } else {
-        //关中断，保证原子操作
-        enum intr_status old_status = intr_disable();
-        while(plock->semaphore.value == 0) {            //无可用信号量，请阻塞当前线程
-            ASSERT(elem_find(&plock->semaphore.waiters, &running_thread()->general_tag) == FALSE);
-            list_append(&plock->semaphore.waiters, &running_thread()->general_tag);
-            thread_block(TASK_BLOCKED);
-        }      
-        //如value为1或被唤醒后 
-        plock->semaphore.value--;
-        ASSERT(plock->semaphore.value == 0);            //因为这是二元信号量
-        intr_set_status(old_status);
-
+        sema_down(&plock->semaphore);
         plock->holder = running_thread();
         ASSERT(plock->holder_repeat_num == 0);          //因为这是线程刚获得锁
         plock->holder_repeat_num = 1;
@@ -53,13 +71,5 @@ void lock_release(struct lock *plock)
     plock->holder = NULL;
     plock->holder_repeat_num = 0;
     
-    enum intr_status old_status = intr_disable();
-    ASSERT(plock->semaphore.value == 0);                //因为这是二元信号量
-    if(list_empty(&plock->semaphore.waiters) == FALSE) {
-        struct task_struct *thread_blocked = (struct task_struct *)elem2entry(struct task_struct, general_tag, list_pop(&plock->semaphore.waiters) );
-        thread_unblock(thread_blocked);
-    }
-    plock->semaphore.value++;
-    ASSERT(plock->semaphore.value == 1);
-    intr_set_status(old_status);
+    sema_up(&plock->semaphore);
 }

@@ -85,5 +85,5 @@ void thread_init(void);     /* 初始化main的线程环境 */
 void schedule(void);
 void thread_block(enum task_status stat);
 void thread_unblock(struct task_struct *pthread);
-
+void thread_yield(void);
 #endif

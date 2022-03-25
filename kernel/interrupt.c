@@ -157,9 +157,10 @@ static void pic_init(void)
     outb(0xa1, 0x28);
     outb(0xa1, 0x02);
     outb(0xa1, 0x01);
-    //只打开主片上IR0，也就是目前只接受时钟产生的中断
-    outb(0x21, 0x00);
-    outb(0xa1, 0xff);
+    //打开主片上的IRQ0时钟，IRQ1键盘，IRQ2级联
+    outb(0x21, 0xf8);
+    //打开从片上的IRQ14，此引脚接收硬盘控制器的中断
+    outb(0xa1, 0xbf);
 
     put_str("   pic_init done\n");
 }
