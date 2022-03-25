@@ -3,6 +3,9 @@
 
 #include "global.h"
 #include "sync.h"
+#include "io.h"
+#include "timer.h"
+#include "interrupt.h"
 struct partition {
     char name[8];
     uint32_t start_lba;             //起始扇区
@@ -33,5 +36,9 @@ struct ide_channel {
     struct disk device[2];
 };
 
+
+void ide_init(void);
+void ide_read(struct disk *hd, uint32_t lba, void *buf, uint8_t sec_cnt);
+void ide_write(struct disk *hd, uint32_t lba, void *buf, uint8_t sec_cnt);
 
 #endif

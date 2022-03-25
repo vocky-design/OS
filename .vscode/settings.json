@@ -8,7 +8,8 @@
         "print.h": "c",
         "string.h": "c",
         "global.h": "c",
-        "cstdint": "c"
+        "cstdint": "c",
+        "timer.h": "c"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }
