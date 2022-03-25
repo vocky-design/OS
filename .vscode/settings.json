@@ -7,7 +7,8 @@
         "memory.h": "c",
         "print.h": "c",
         "string.h": "c",
-        "global.h": "c"
+        "global.h": "c",
+        "cstdint": "c"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }
