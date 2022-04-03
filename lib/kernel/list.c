@@ -99,7 +99,7 @@ struct list_elem *list_traversal(struct list *list, traversal_func func, int arg
         if(func(elem, arg) == TRUE) {
             return elem;
         }
-        elem = elem->next;
+        elem = elem->next;              //如果func返回FALSE,就继续进行
     }
 
     return NULL;

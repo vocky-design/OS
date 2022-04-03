@@ -85,7 +85,7 @@ $(BUILD_DIR)/list.o: lib/kernel/list.c kernel/interrupt.h lib/kernel/stdint.h
 $(BUILD_DIR)/string.o: lib/string.c lib/kernel/stdint.h lib/debug.h 
 	$(CC) $(CFLAGS) -o $@ $<
 
-$(BUILD_DIR)/debug.o: lib/debug.c lib/kernel/print.h kernel/interrupt.h
+$(BUILD_DIR)/debug.o: lib/debug.c lib/debug.h lib/kernel/print.h kernel/interrupt.h lib/stdio.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(BUILD_DIR)/syscall.o: lib/usr/syscall.c lib/kernel/stdint.h

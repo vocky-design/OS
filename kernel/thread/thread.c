@@ -64,7 +64,7 @@ void thread_create(struct task_struct *pthread, thread_func *function, void *fun
 {
     pthread->self_kstack -= sizeof(struct intr_stack);
     pthread->self_kstack -= sizeof(struct thread_stack);
-    //目前self_kstack指针就更新到了这里
+    //在初始化阶段，self_kstack指针就指向了这里。
     struct thread_stack *kthread_stack = (struct thread_stack *)pthread->self_kstack;
     kthread_stack->ebp = kthread_stack->ebx = kthread_stack->esi = kthread_stack->edi = 0;
     kthread_stack->eip = kernel_thread;
@@ -89,7 +89,7 @@ struct task_struct *thread_start(char *name, int prio, thread_func function, voi
 }
 
 /*************************************************************************************************************************/
-/* 将kernel中的main函数完善为主线程 */
+/* 将kernel中的main函数创建为主线程 */
 static void make_main_thread(void)
 {
     //因为main函数早已运行，esp=0xc009f000,已经预留一个PCB位置
@@ -191,7 +191,7 @@ void thread_block(enum task_status stat)
     intr_set_status(old_status);
 }
 
-//线程唤醒函数
+//线程唤醒函数：唤醒进程push到队列头，等待schedule
 void thread_unblock(struct task_struct *pthread)
 {
     ASSERT(pthread->status == TASK_BLOCKED || pthread->status == TASK_WAITING || pthread->status == TASK_HANGING);

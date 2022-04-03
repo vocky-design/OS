@@ -21,25 +21,7 @@ static void start_process(void *filename_)
     asm volatile("movl %0,%%esp; jmp intr_exit"::"m"(proc_stack):"memory");
 }
 
-/*
-static void start_process(void *filename_)
-{
-    void *function = filename_;
-    //struct task_struct *cur = running_thread();
-    //cur->self_kstack += sizeof(struct thread_stack);
-    struct intr_stack proc_stack;
-    proc_stack.edi = proc_stack.esi = proc_stack.ebp = proc_stack.esp_dummy = 0;
-    proc_stack.ebx = proc_stack.edx = proc_stack.ecx = proc_stack.eax = 0;
-    proc_stack.gs = 0;          //用户态用不上，直接初始化为0
-    proc_stack.ds = proc_stack.es = proc_stack.fs = SELECTOR_U_DATA;
-    proc_stack.eip = function;
-    proc_stack.cs = SELECTOR_U_CODE;
-    proc_stack.eflags = EFLAGS_IOPL_0 | EFLAGS_MBS | EFLAGS_IF_1;
-    proc_stack.esp = (void *)((uint32_t)get_a_page(PF_USER, USER_STACK3_VADDR) + PG_SIZE);
-    proc_stack.ss = SELECTOR_U_DATA;
-    asm volatile("movl %0,%%esp; jmp intr_exit"::"m"(proc_stack):"memory");
-}
-*/
+
 void process_activate(struct task_struct *pthread)
 {
     ASSERT(pthread != NULL);
@@ -52,7 +34,6 @@ void process_activate(struct task_struct *pthread)
     asm volatile("movl %0,%%cr3"::"r"(pdt_phy_addr):"memory");
     
     if(pthread->pgdir) {
-        //切换TSS
         update_tss_esp0(pthread);
     }
 }

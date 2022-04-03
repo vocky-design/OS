@@ -50,7 +50,6 @@ enum intr_status intr_disable(void)
         return old_status;
     }
 }
-
 /* 将中断状态设置为status */
 enum intr_status intr_set_status(enum intr_status status)
 {
@@ -123,7 +122,7 @@ void register_handler(uint8_t vector_no, intr_handler function)
     idt_function[vector_no] = function;
 }
 
-/* 初始化中断门描述符 */
+/* 创建中断门描述符 */
 static void make_idt_desc(struct gate_desc *p_gdesc, uint8_t attr, intr_handler function)
 {
     p_gdesc->func_offset_low_word = (uint32_t)function & 0x0000FFFF;
@@ -159,8 +158,8 @@ static void pic_init(void)
     outb(0xa1, 0x01);
     //打开主片上的IRQ0时钟，IRQ1键盘，IRQ2级联
     outb(0x21, 0xf8);
-    //打开从片上的IRQ14，此引脚接收硬盘控制器的中断
-    outb(0xa1, 0xbf);
+    //打开从片上的IRQ14，IRQ15,此引脚接收硬盘控制器的中断
+    outb(0xa1, 0x3f);
 
     put_str("   pic_init done\n");
 }

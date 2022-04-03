@@ -9,7 +9,9 @@
         "string.h": "c",
         "global.h": "c",
         "cstdint": "c",
-        "timer.h": "c"
+        "timer.h": "c",
+        "typeinfo": "c",
+        "stdio.h": "c"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }

@@ -33,40 +33,43 @@ static uint32_t vsprintf(char *str, const char *format, va_list ap)
 {
     int arg_int, arg_uint;
     char *arg_str;
-    if(*format != '%') {
-        *str++ = *format++;
-    } else {
-        ++format;           //跳过'%'
-        switch(*format) {
-            case 'x':
-                arg_uint= va_arg(ap, uint32_t);
-                itoa(arg_uint, &str, 16);
-                ++format;
-                break;
-            case 'd':
-                arg_int = va_arg(ap, int);
-                if(arg_int < 0) {
-                    arg_int = 0 - arg_int;
-                    *str++ = '-';
-                }
-                itoa(arg_int, &str, 10);
-                ++format;
-                break;
-            case 's':
-                arg_str = va_arg(ap, char *);
-                strcpy(str, arg_str);
-                str += strlen(arg_str);
-                ++format;
-                break;
-            case 'c':
-                *str++ = va_arg(ap, char);
-                ++format;
-                break;
-            default:
-                PANIC("% of format must be one of x,d,s,c");
-                break;
+    while(*format) {
+        if(*format != '%') {
+            *str++ = *format++;
+        } else {
+            ++format;           //跳过'%'
+            switch(*format) {
+                case 'x':
+                    arg_uint= va_arg(ap, uint32_t);
+                    itoa(arg_uint, &str, 16);
+                    ++format;
+                    break;
+                case 'd':
+                    arg_int = va_arg(ap, int);
+                    if(arg_int < 0) {
+                        arg_int = 0 - arg_int;
+                        *str++ = '-';
+                    }
+                    itoa(arg_int, &str, 10);
+                    ++format;
+                    break;
+                case 's':
+                    arg_str = va_arg(ap, char *);
+                    strcpy(str, arg_str);
+                    str += strlen(arg_str);
+                    ++format;
+                    break;
+                case 'c':
+                    *str++ = va_arg(ap, char);
+                    ++format;
+                    break;
+                default:
+                    PANIC("% of format must be one of x,d,s,c");
+                    break;
+            }
         }
     }
+
     return strlen(str);
 }
 
@@ -89,4 +92,16 @@ uint32_t sprintf(char *buf, const char *format, ...)
     uint32_t retval = vsprintf(buf, format, ap);
     va_end(ap);
     return retval;
+}
+
+/* 与printf的区别是不使用write系统调用 */
+uint32_t printk(const char *format, ...)
+{
+    va_list ap;
+    va_start(ap, format);
+    char buf[1024] = {0};
+    uint32_t len = vsprintf(buf, format, ap);
+    va_end(ap);
+    console_put_str(buf);
+    return len;
 }

@@ -14,9 +14,8 @@ void sema_down(struct semaphore *psema)
     enum intr_status old_status = intr_disable();
 
     while(psema->value == 0) {
-        //当前线程不应该在信号量的waiters队列中
-        ASSERT(!elem_find(&psema->waiters, &running_thread()->general_tag));
         //把当前线程加入到waiters中
+        ASSERT(!elem_find(&psema->waiters, &running_thread()->general_tag));
         list_append(&psema->waiters, &running_thread()->general_tag);
         thread_block(TASK_BLOCKED);
     }
@@ -24,12 +23,12 @@ void sema_down(struct semaphore *psema)
     psema->value--;
     intr_set_status(old_status);
 }
-
+/* sema_up并不是瞬间切换，而是将唤醒线程作为下一个schedule的目标 */
 void sema_up(struct semaphore *psema)
 {
     //关中断，保证原子操作
     enum intr_status old_status = intr_disable();
-    if(!list_empty(&psema->waiters)) {
+    if(!list_empty(&psema->waiters)) {          //waiters队列中有内容
         struct task_struct *thread_blocked = elem2entry(struct task_struct, general_tag, list_pop(&psema->waiters));
         thread_unblock(thread_blocked);
     }
