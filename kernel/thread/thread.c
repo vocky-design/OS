@@ -5,7 +5,7 @@
 extern void switch_to(struct task_struct *cur_thread, struct task_struct *next_thread);
 
 struct task_struct *main_thread;        //主线程PCB
-
+struct task_struct *idle_thread;
 struct lock pid_lock;                   //pid唯一，分配pid时需互斥
 
 /* 分配pid */
@@ -64,7 +64,7 @@ void thread_create(struct task_struct *pthread, thread_func *function, void *fun
 {
     pthread->self_kstack -= sizeof(struct intr_stack);
     pthread->self_kstack -= sizeof(struct thread_stack);
-    //目前self_kstack指针就更新到了这里
+    //在初始化阶段，self_kstack指针就指向了这里。
     struct thread_stack *kthread_stack = (struct thread_stack *)pthread->self_kstack;
     kthread_stack->ebp = kthread_stack->ebx = kthread_stack->esi = kthread_stack->edi = 0;
     kthread_stack->eip = kernel_thread;
@@ -89,7 +89,7 @@ struct task_struct *thread_start(char *name, int prio, thread_func function, voi
 }
 
 /*************************************************************************************************************************/
-/* 将kernel中的main函数完善为主线程 */
+/* 将kernel中的main函数创建为主线程 */
 static void make_main_thread(void)
 {
     //因为main函数早已运行，esp=0xc009f000,已经预留一个PCB位置
@@ -101,6 +101,16 @@ static void make_main_thread(void)
     list_append(&thread_all_list, &main_thread->all_list_tag);   
 }
 
+/* 系统空闲时运行的进程 */
+static void idle(void *UNUSED)
+{
+    while(1) {
+        //阻塞自己
+        thread_block(TASK_BLOCKED);
+        //醒来后
+        asm volatile("sti; hlt":::"memory");
+    }
+}
 
 /* 初始化线程环境 */
 void thread_init(void)
@@ -111,6 +121,8 @@ void thread_init(void)
     lock_init(&pid_lock);
     //初始化main的PCB，并挂载到总队列中
     make_main_thread();
+    //创建idle线程
+    idle_thread = thread_start("idle", 10, idle, NULL);
     put_str("thread_init done\n");
 }
 
@@ -136,8 +148,11 @@ void schedule(void)
         //其他情况调用schedule，进入时status已经不是TASK_RUNNING了。
     }
 
+    //如果就绪队列中没有可运行的任务，就唤醒idle
+    if(list_empty(&thread_ready_list)) {
+        thread_unblock(idle_thread);
+    }
     //取出下一个任务
-    ASSERT(list_empty(&thread_ready_list) == FALSE);
     struct list_elem *thread_tag = list_pop(&thread_ready_list);
     struct task_struct *next_thread = elem2entry(struct task_struct, general_tag, thread_tag);
     //更新下一个任务的status
@@ -147,12 +162,25 @@ void schedule(void)
 
 }
 
+/* 主动让出cpu，换其他线程运行 */
+void thread_yield(void)
+{
+    struct task_struct *cur = running_thread();
+    enum intr_status old_status = intr_disable();
+    ASSERT(!elem_find(&thread_ready_list, &cur->general_tag));
+    list_append(&thread_ready_list, &cur->general_tag);
+    cur->status = TASK_READY;
+    //等于说前面做了一次特殊的schedule流程。
+    schedule();
+    intr_set_status(old_status);
+}
+
 //线程阻塞函数
 void thread_block(enum task_status stat)
 {
     //对参数的限制
     ASSERT(stat == TASK_BLOCKED || stat == TASK_WAITING || stat == TASK_HANGING);
-    //关闭中断
+    //关闭中断,要求原子操作
     enum task_status old_status =  intr_disable();                                                                                                       intr_disable();
     //
     struct task_struct *cur_thread = running_thread();
@@ -163,7 +191,7 @@ void thread_block(enum task_status stat)
     intr_set_status(old_status);
 }
 
-//线程唤醒函数
+//线程唤醒函数：唤醒进程push到队列头，等待schedule
 void thread_unblock(struct task_struct *pthread)
 {
     ASSERT(pthread->status == TASK_BLOCKED || pthread->status == TASK_WAITING || pthread->status == TASK_HANGING);

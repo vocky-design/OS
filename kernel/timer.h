@@ -1,6 +1,8 @@
 #ifndef _KERNEL_TIMER_H
 #define _KERNEL_TIMER_H
-
+#include "io.h"
+#include "thread.h"
+#include "interrupt.h"
 /* 控制字段属性 */
 //端口号
 #define CONTROL_PORT        0x43
@@ -30,9 +32,10 @@
 #define COUNTER2_PORT       0x42
 //初值字段组合
 #define INPUT_FREQUENCY     1193180
-#define COUNTER0_VALUE      (INPUT_FREQUENCY/100)           //100HZ
+#define IRQ0_FREQUENCY      100
+#define COUNTER0_VALUE      (INPUT_FREQUENCY/IRQ0_FREQUENCY)           //100HZ
 
 
 void timer_init(void);
-
+void mtime_sleep(uint32_t m_seconds);
 #endif

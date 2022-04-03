@@ -12,10 +12,8 @@ OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/init.o $(BUILD_DIR)/interrupt.o $(BUILD_
 	$(BUILD_DIR)/kernel.o $(BUILD_DIR)/print.o $(BUILD_DIR)/debug.o $(BUILD_DIR)/string.o $(BUILD_DIR)/bitmap.o \
 	$(BUILD_DIR)/memory.o $(BUILD_DIR)/thread.o $(BUILD_DIR)/list.o $(BUILD_DIR)/switch.o $(BUILD_DIR)/sync.o   \
 	$(BUILD_DIR)/console.o $(BUILD_DIR)/keyboard.o $(BUILD_DIR)/ioqueue.o $(BUILD_DIR)/tss.o $(BUILD_DIR)/process.o \
-<<<<<<< HEAD
- 	$(BUILD_DIR)/syscall-init.o $(BUILD_DIR)/syscall.o
-=======
->>>>>>> 2bc1b919ec8b42dbaa29946045813fe89d9074e5
+ 	$(BUILD_DIR)/syscall-init.o $(BUILD_DIR)/syscall.o $(BUILD_DIR)/stdio.h $(BUILD_DIR)/ide.o
+
 ####################### C编译 #######################################
 ##KERNEL##
 $(BUILD_DIR)/main.o: kernel/main.c kernel/global.h kernel/init.h kernel/interrupt.h  \
@@ -23,7 +21,8 @@ kernel/memory.h kernel/thread/thread.h kernel/userprog/process.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(BUILD_DIR)/init.o: kernel/init.c lib/kernel/print.h kernel/interrupt.h kernel/timer.h kernel/memory.h \
-kernel/thread/thread.h kernel/device/console.h kernel/device/keyboard.h kernel/userprog/tss.h
+kernel/thread/thread.h kernel/device/console.h kernel/device/keyboard.h kernel/userprog/tss.h \
+kernel/device/ide.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(BUILD_DIR)/interrupt.o: kernel/interrupt.c kernel/global.h lib/kernel/io.h 
@@ -59,6 +58,10 @@ $(BUILD_DIR)/ioqueue.o: kernel/device/ioqueue.c	kernel/global.h \
 kernel/thread/thread.h kernel/thread/sync.h kernel/interrupt.h
 	$(CC) $(CFLAGS) -o $@ $<
 
+$(BUILD_DIR)/ide.o: kernel/device/ide.c kernel/global.h kernel/thread/sync.h \
+lib/kernel/io.h kernel/timer.h kernel/interrupt.h
+	$(CC) $(CFLAGS) -o $@ $<
+
 ##KERNEL/USERPROG##
 $(BUILD_DIR)/tss.o:	kernel/userprog/tss.c kernel/global.h \
 kernel/thread/thread.h 
@@ -82,12 +85,14 @@ $(BUILD_DIR)/list.o: lib/kernel/list.c kernel/interrupt.h lib/kernel/stdint.h
 $(BUILD_DIR)/string.o: lib/string.c lib/kernel/stdint.h lib/debug.h 
 	$(CC) $(CFLAGS) -o $@ $<
 
-$(BUILD_DIR)/debug.o: lib/debug.c lib/kernel/print.h kernel/interrupt.h
+$(BUILD_DIR)/debug.o: lib/debug.c lib/debug.h lib/kernel/print.h kernel/interrupt.h lib/stdio.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(BUILD_DIR)/syscall.o: lib/usr/syscall.c lib/kernel/stdint.h
 	$(CC) $(CFLAGS) -o $@ $<
 
+$(BUILD_DIR)/stdio.h: lib/stdio.c kernel/global.h lib/kernel/stdint.h
+	$(CC) $(CFLAGS) -o $@ $<
 ####################### NASM编译 #######################################
 $(BUILD_DIR)/kernel.o: kernel/kernel.S 
 	$(AS) $(ASFLAGS) -o $@ $<

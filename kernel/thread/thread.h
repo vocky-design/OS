@@ -3,7 +3,7 @@
 #include "global.h"
 #include "memory.h"
 
-/* 自定义通用函数类型 */
+/* 自定义通用线程函数类型 */
 typedef void thread_func(void *);
 
 /* 任务等待队列和总队列 */
@@ -53,7 +53,7 @@ struct thread_stack {
     uint32_t esi;
     //线程第一次执行时，eip指向待调用的函数kernel_thread;其他时候，eip是指向switch_to的返回地址
     void (*eip) (thread_func *func, void *func_arg);
-    void (*unused_retaddr);
+    void (*unused_retaddr);     //只为了占位置，充数为返回地址。
     thread_func *function;
     void *func_arg;
 };
@@ -67,6 +67,7 @@ struct task_struct {
     uint8_t priority;
     uint8_t ticks;
     uint32_t elapsed_ticks;                 // 此任务自上CPU运行后至今占用了多少CPU滴答数
+    //进程专用
     uint32_t *pgdir;                        //进程自己页目录表的虚拟地址
     struct vaddr_pool userprog_vaddr_pool;  //每个用户进程单独管理一个虚拟内存池
     struct mem_block_desc u_block_descs[DESC_CNT];
@@ -85,5 +86,5 @@ void thread_init(void);     /* 初始化main的线程环境 */
 void schedule(void);
 void thread_block(enum task_status stat);
 void thread_unblock(struct task_struct *pthread);
-
+void thread_yield(void);
 #endif

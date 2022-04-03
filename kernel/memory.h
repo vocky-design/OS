@@ -22,9 +22,9 @@ struct mem_block {
 
 /* 内存块描述符 */
 struct mem_block_desc {
-    uint32_t block_size;
-    uint32_t blocks_per_arena;
-    struct list free_list;
+    uint32_t block_size;        //块大小
+    uint32_t blocks_per_arena;  //每arena块数
+    struct list free_list;      //块链
 };
 
 /* 内存仓库arena */

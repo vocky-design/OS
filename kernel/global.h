@@ -8,6 +8,7 @@
 #include "string.h"
 #include "bitmap.h"
 #include "list.h"
+#include "stdio.h"
 #define PG_SIZE 4096
 
 /* GDT描述符的结构 */
