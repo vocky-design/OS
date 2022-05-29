@@ -10,6 +10,6 @@ struct bitmap {
 
 void bitmap_init(struct bitmap *btmp);
 bool bitmap_bit_test(struct bitmap *btmp, uint32_t bit_idx);
-uint32_t bitmap_scan(struct bitmap *btmp, uint32_t cnt);
+int32_t bitmap_scan(struct bitmap *btmp, uint32_t cnt);
 void bitmap_set(struct bitmap *btmp, uint32_t bit_idx, bool value);
 #endif

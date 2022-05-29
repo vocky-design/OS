@@ -1,8 +1,7 @@
 #include "bitmap.h"
-
+//清空位图占用空间
 void bitmap_init(struct bitmap *btmp)
 {
-    //清空位图占用空间
     memset(btmp->bytes, 0, btmp->btmp_bytes_len);
 }
 /* 判断bit_idx位是否为1，该位有1则返回1，否则返回0 */
@@ -13,7 +12,7 @@ bool bitmap_bit_test(struct bitmap *btmp, uint32_t bit_idx)
     return btmp->bytes[byte_idx] & (1 << byte_odd) ;
 }
 /* 在位图中申请连续cnt个位，成功，则返回其起始位下标，失败返回-1 */
-uint32_t bitmap_scan(struct bitmap *btmp, uint32_t cnt)
+int32_t bitmap_scan(struct bitmap *btmp, uint32_t cnt)
 {
     uint32_t byte_idx = 0;
     while(0xff == btmp->bytes[byte_idx] && byte_idx < btmp->btmp_bytes_len) {
@@ -50,7 +49,7 @@ uint32_t bitmap_scan(struct bitmap *btmp, uint32_t cnt)
         }
         ++next_bit_idx;
     }
-    return (uint32_t)bit_idx_start;
+    return (int32_t)bit_idx_start;
 }
 /* 将位图btmp的bit_idx位设置为value */
 void bitmap_set(struct bitmap *btmp, uint32_t bit_idx, bool value)

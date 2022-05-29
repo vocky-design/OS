@@ -1,0 +1,155 @@
+<mxfile host="65bd71144e">
+    <diagram id="CMEOy8UuN6_TeFY04kTR" name="inode_open">
+        <mxGraphModel dx="714" dy="567" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="" style="edgeStyle=none;html=1;" parent="1" source="3" target="5" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="开始" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.start_1;whiteSpace=wrap;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="30" width="100" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="" style="edgeStyle=none;html=1;" parent="1" source="5" target="8" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="先检索open_inodes链表" style="whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="90" y="170" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="Y" style="edgeStyle=none;html=1;" parent="1" source="8" target="10" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="N" style="edgeStyle=none;html=1;" parent="1" source="8" target="12" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="已找到" style="rhombus;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="110" y="300" width="80" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" style="edgeStyle=none;html=1;" parent="1" source="10" target="17" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="返回inode指针" style="whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="290" y="310" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="" style="edgeStyle=none;html=1;" parent="1" source="12" target="14" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="从磁盘读inode" style="whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="90" y="470" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="" style="edgeStyle=none;html=1;" parent="1" source="14" target="16" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="链接到open_inodes链表" style="whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="90" y="610" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="" style="edgeStyle=none;html=1;" parent="1" source="16" target="17" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="返回inode指针" style="whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="90" y="750" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="结束" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="290" y="750" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="新申请的inode节点需要在内核空间申请，目的是所有进程共享。" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="220" y="490" width="100" height="160" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="10CW3tefhIZZF5n-_TRo" name="inode_sync">
+        <mxGraphModel dx="714" dy="567" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" math="0" shadow="0">
+            <root>
+                <mxCell id="6rgz0jIkckmuSkoaB_ld-0"/>
+                <mxCell id="6rgz0jIkckmuSkoaB_ld-1" parent="6rgz0jIkckmuSkoaB_ld-0"/>
+                <mxCell id="6rgz0jIkckmuSkoaB_ld-2" value="" style="edgeStyle=none;html=1;" parent="6rgz0jIkckmuSkoaB_ld-1" source="6rgz0jIkckmuSkoaB_ld-3" target="6rgz0jIkckmuSkoaB_ld-6" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="6rgz0jIkckmuSkoaB_ld-3" value="开始" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.start_1;whiteSpace=wrap;" parent="6rgz0jIkckmuSkoaB_ld-1" vertex="1">
+                    <mxGeometry x="90" y="80" width="100" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="6rgz0jIkckmuSkoaB_ld-4" value="功能：将inode更新到分区的inode_table相应位置" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="6rgz0jIkckmuSkoaB_ld-1" vertex="1">
+                    <mxGeometry x="80" y="30" width="380" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="6rgz0jIkckmuSkoaB_ld-5" value="" style="edgeStyle=none;html=1;" parent="6rgz0jIkckmuSkoaB_ld-1" source="6rgz0jIkckmuSkoaB_ld-6" target="6rgz0jIkckmuSkoaB_ld-8" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="6rgz0jIkckmuSkoaB_ld-6" value="定位inode位置" style="whiteSpace=wrap;html=1;strokeWidth=2;" parent="6rgz0jIkckmuSkoaB_ld-1" vertex="1">
+                    <mxGeometry x="80" y="180" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="6rgz0jIkckmuSkoaB_ld-7" value="" style="edgeStyle=none;html=1;" parent="6rgz0jIkckmuSkoaB_ld-1" source="6rgz0jIkckmuSkoaB_ld-8" target="6rgz0jIkckmuSkoaB_ld-11" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="6rgz0jIkckmuSkoaB_ld-8" value="写入的inode部分成员要清零" style="whiteSpace=wrap;html=1;strokeWidth=2;" parent="6rgz0jIkckmuSkoaB_ld-1" vertex="1">
+                    <mxGeometry x="80" y="280" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="6rgz0jIkckmuSkoaB_ld-10" value="" style="edgeStyle=none;html=1;" parent="6rgz0jIkckmuSkoaB_ld-1" source="6rgz0jIkckmuSkoaB_ld-11" target="6rgz0jIkckmuSkoaB_ld-13" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="6rgz0jIkckmuSkoaB_ld-11" value="读入inode所在扇区" style="whiteSpace=wrap;html=1;strokeWidth=2;" parent="6rgz0jIkckmuSkoaB_ld-1" vertex="1">
+                    <mxGeometry x="80" y="380" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="6rgz0jIkckmuSkoaB_ld-12" value="" style="edgeStyle=none;html=1;" parent="6rgz0jIkckmuSkoaB_ld-1" source="6rgz0jIkckmuSkoaB_ld-13" target="6rgz0jIkckmuSkoaB_ld-15" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="6rgz0jIkckmuSkoaB_ld-13" value="修改数据" style="whiteSpace=wrap;html=1;strokeWidth=2;" parent="6rgz0jIkckmuSkoaB_ld-1" vertex="1">
+                    <mxGeometry x="80" y="480" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="6rgz0jIkckmuSkoaB_ld-14" value="" style="edgeStyle=none;html=1;" parent="6rgz0jIkckmuSkoaB_ld-1" source="6rgz0jIkckmuSkoaB_ld-15" target="6rgz0jIkckmuSkoaB_ld-16" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="6rgz0jIkckmuSkoaB_ld-15" value="重新写回" style="whiteSpace=wrap;html=1;strokeWidth=2;" parent="6rgz0jIkckmuSkoaB_ld-1" vertex="1">
+                    <mxGeometry x="80" y="580" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="6rgz0jIkckmuSkoaB_ld-16" value="结束" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=2;" parent="6rgz0jIkckmuSkoaB_ld-1" vertex="1">
+                    <mxGeometry x="80" y="680" width="120" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="E0sRRDDywEszPI604GjF" name="inode_release">
+        <mxGraphModel dx="714" dy="5248" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" math="0" shadow="0">
+            <root>
+                <mxCell id="FovIY36lLXxFzwl70lYe-0"/>
+                <mxCell id="FovIY36lLXxFzwl70lYe-1" parent="FovIY36lLXxFzwl70lYe-0"/>
+                <mxCell id="FovIY36lLXxFzwl70lYe-4" value="" style="edgeStyle=none;html=1;fontStyle=1" edge="1" parent="FovIY36lLXxFzwl70lYe-1" source="FovIY36lLXxFzwl70lYe-2" target="FovIY36lLXxFzwl70lYe-3">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="FovIY36lLXxFzwl70lYe-2" value="开始" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.start_1;whiteSpace=wrap;fontStyle=1" vertex="1" parent="FovIY36lLXxFzwl70lYe-1">
+                    <mxGeometry x="180" y="40" width="100" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="FovIY36lLXxFzwl70lYe-7" value="" style="edgeStyle=none;html=1;fontStyle=1" edge="1" parent="FovIY36lLXxFzwl70lYe-1" source="FovIY36lLXxFzwl70lYe-3" target="FovIY36lLXxFzwl70lYe-6">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="FovIY36lLXxFzwl70lYe-3" value="获得目标inode指针" style="whiteSpace=wrap;html=1;strokeWidth=2;fontStyle=1" vertex="1" parent="FovIY36lLXxFzwl70lYe-1">
+                    <mxGeometry x="170" y="130" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="FovIY36lLXxFzwl70lYe-5" value="&#10;&#10;&lt;div style=&quot;color: rgb(51, 51, 51); background-color: rgb(245, 245, 245); font-family: consolas, &amp;quot;courier new&amp;quot;, monospace; font-weight: normal; font-size: 14px; line-height: 19px;&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: #7a3e9d ; font-weight: bold&quot;&gt;int32_t&lt;/span&gt;&lt;span style=&quot;color: #333333&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #aa3731 ; font-weight: bold&quot;&gt;inode_release&lt;/span&gt;&lt;span style=&quot;color: #777777&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color: #7a3e9d&quot;&gt;struct&lt;/span&gt;&lt;span style=&quot;color: #333333&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #7a3e9d ; font-weight: bold&quot;&gt;partition&lt;/span&gt;&lt;span style=&quot;color: #333333&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #777777&quot;&gt;*&lt;/span&gt;&lt;span style=&quot;color: #7a3e9d&quot;&gt;part&lt;/span&gt;&lt;span style=&quot;color: #777777&quot;&gt;,&lt;/span&gt;&lt;span style=&quot;color: #333333&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #7a3e9d ; font-weight: bold&quot;&gt;uint32_t&lt;/span&gt;&lt;span style=&quot;color: #333333&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #7a3e9d&quot;&gt;inode_no&lt;/span&gt;&lt;span style=&quot;color: #777777&quot;&gt;);&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&#10;&#10;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="FovIY36lLXxFzwl70lYe-1">
+                    <mxGeometry x="20" y="10" width="530" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="FovIY36lLXxFzwl70lYe-9" value="" style="edgeStyle=none;html=1;fontStyle=1" edge="1" parent="FovIY36lLXxFzwl70lYe-1" source="FovIY36lLXxFzwl70lYe-6" target="FovIY36lLXxFzwl70lYe-8">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="FovIY36lLXxFzwl70lYe-6" value="回收block_bitmap的相应位(不必清空block)" style="whiteSpace=wrap;html=1;strokeWidth=2;fontStyle=1" vertex="1" parent="FovIY36lLXxFzwl70lYe-1">
+                    <mxGeometry x="170" y="220" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="FovIY36lLXxFzwl70lYe-11" value="" style="edgeStyle=none;html=1;fontStyle=1" edge="1" parent="FovIY36lLXxFzwl70lYe-1" source="FovIY36lLXxFzwl70lYe-8" target="FovIY36lLXxFzwl70lYe-10">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="FovIY36lLXxFzwl70lYe-8" value="清空inode_table的inode" style="whiteSpace=wrap;html=1;strokeWidth=2;fontStyle=1" vertex="1" parent="FovIY36lLXxFzwl70lYe-1">
+                    <mxGeometry x="170" y="310" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="FovIY36lLXxFzwl70lYe-13" value="" style="edgeStyle=none;html=1;fontStyle=1" edge="1" parent="FovIY36lLXxFzwl70lYe-1" source="FovIY36lLXxFzwl70lYe-10" target="FovIY36lLXxFzwl70lYe-12">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="FovIY36lLXxFzwl70lYe-10" value="回收inode_bitmap的相应位" style="whiteSpace=wrap;html=1;strokeWidth=2;fontStyle=1" vertex="1" parent="FovIY36lLXxFzwl70lYe-1">
+                    <mxGeometry x="170" y="400" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="FovIY36lLXxFzwl70lYe-12" value="结束" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=2;fontStyle=1" vertex="1" parent="FovIY36lLXxFzwl70lYe-1">
+                    <mxGeometry x="170" y="490" width="120" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

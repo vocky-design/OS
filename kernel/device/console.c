@@ -1,6 +1,6 @@
 #include "console.h"
 #include "sync.h"
-
+//终端输出锁
 static struct lock console_lock;
 
 void console_init(void)

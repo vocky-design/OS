@@ -1,8 +1,6 @@
 #ifndef _LIB_KERNEL_LIST_H
 #define _LIB_KERNEL_LIST_H
 
-#include "stdint.h"
-
 #define offset(struct_type, member)   (int)(&((struct_type *)0)->member)   
 #define elem2entry(struct_type, member_name, member_ptr)    (struct_type *)((int)member_ptr - offset(struct_type, member_name))
 

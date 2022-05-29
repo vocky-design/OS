@@ -1,0 +1,166 @@
+<mxfile host="65bd71144e">
+    <diagram id="VCxxM9zJBiejnTR9q7NK" name="dir_entry_search">
+        <mxGraphModel dx="954" dy="567" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="5" value="" style="edgeStyle=none;html=1;fontStyle=1" parent="1" source="3" target="4" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="开始" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.start_1;whiteSpace=wrap;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="116" y="113" width="100" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="" style="edgeStyle=none;html=1;fontStyle=1" parent="1" source="4" target="8" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="尝试读目录的140个block地址" style="whiteSpace=wrap;html=1;strokeWidth=2;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="106" y="213" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="" style="edgeStyle=none;html=1;fontStyle=1" parent="1" source="8" target="10" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="检查block是否为空" style="whiteSpace=wrap;html=1;strokeWidth=2;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="106" y="313" width="120" height="54" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="" style="edgeStyle=none;html=1;fontStyle=1" parent="1" source="10" target="12" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="N" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1" parent="13" vertex="1" connectable="0">
+                    <mxGeometry x="-0.2222" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="17" value="Y" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontStyle=1" parent="1" source="10" target="8" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="286" y="453"/>
+                            <mxPoint x="286" y="343"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="10" value="block为空？" style="rhombus;whiteSpace=wrap;html=1;strokeWidth=2;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="106" y="413" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontStyle=1" parent="1" source="12" target="18" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="检查目录项是否匹配" style="whiteSpace=wrap;html=1;strokeWidth=2;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="106" y="533" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="Y" style="edgeStyle=orthogonalEdgeStyle;html=1;fontStyle=1" parent="1" source="18" target="23" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="N" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="18" target="12" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="286" y="633" as="sourcePoint"/>
+                        <Array as="points">
+                            <mxPoint x="286" y="673"/>
+                            <mxPoint x="286" y="563"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="18" value="目录项name匹配？" style="rhombus;whiteSpace=wrap;html=1;strokeWidth=2;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="106" y="633" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="结束" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=2;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="106" y="753" width="120" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="fO9ujahP8jmvmLGbq9yT" name="dir_entry_sync">
+        <mxGraphModel dx="954" dy="567" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" math="0" shadow="0">
+            <root>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-0"/>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-1" parent="aTyR3iRUwYFkhW4yYsar-0"/>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-4" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" source="aTyR3iRUwYFkhW4yYsar-2" target="aTyR3iRUwYFkhW4yYsar-3" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-2" value="开始" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.start_1;whiteSpace=wrap;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" vertex="1">
+                    <mxGeometry x="400" y="40" width="100" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-6" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" source="aTyR3iRUwYFkhW4yYsar-3" target="aTyR3iRUwYFkhW4yYsar-5" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-3" value="尝试读目录的140个block" style="whiteSpace=wrap;html=1;strokeWidth=2;spacing=2;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" vertex="1">
+                    <mxGeometry x="390" y="180" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-8" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" source="aTyR3iRUwYFkhW4yYsar-5" target="aTyR3iRUwYFkhW4yYsar-7" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-5" value="检查每一个block地址是否为空" style="whiteSpace=wrap;html=1;strokeWidth=2;spacing=2;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" vertex="1">
+                    <mxGeometry x="390" y="320" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-10" value="N" style="edgeStyle=orthogonalEdgeStyle;html=1;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" source="aTyR3iRUwYFkhW4yYsar-7" target="aTyR3iRUwYFkhW4yYsar-9" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-29" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" source="aTyR3iRUwYFkhW4yYsar-7" target="aTyR3iRUwYFkhW4yYsar-28" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-7" value="block地址为空？" style="rhombus;whiteSpace=wrap;html=1;strokeWidth=2;spacing=2;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" vertex="1">
+                    <mxGeometry x="380" y="450" width="140" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-12" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" source="aTyR3iRUwYFkhW4yYsar-9" target="aTyR3iRUwYFkhW4yYsar-11" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-9" value="检查每一个目录项是否为空" style="whiteSpace=wrap;html=1;strokeWidth=2;spacing=2;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" vertex="1">
+                    <mxGeometry x="610" y="460" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-14" value="Y" style="edgeStyle=orthogonalEdgeStyle;html=1;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" source="aTyR3iRUwYFkhW4yYsar-11" target="aTyR3iRUwYFkhW4yYsar-13" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-15" value="N" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" source="aTyR3iRUwYFkhW4yYsar-11" target="aTyR3iRUwYFkhW4yYsar-9" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="780" y="640"/>
+                            <mxPoint x="780" y="490"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-11" value="目录项为空？" style="rhombus;whiteSpace=wrap;html=1;strokeWidth=2;spacing=2;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" vertex="1">
+                    <mxGeometry x="600" y="600" width="140" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-17" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" source="aTyR3iRUwYFkhW4yYsar-13" target="aTyR3iRUwYFkhW4yYsar-16" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-13" value="添加目录项到空闲位置" style="whiteSpace=wrap;html=1;strokeWidth=2;spacing=2;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" vertex="1">
+                    <mxGeometry x="610" y="770" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-16" value="结束" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=2;spacing=2;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" vertex="1">
+                    <mxGeometry x="610" y="910" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-23" value="Y" style="edgeStyle=orthogonalEdgeStyle;html=1;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" source="aTyR3iRUwYFkhW4yYsar-20" target="aTyR3iRUwYFkhW4yYsar-22" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-27" value="N" style="edgeStyle=orthogonalEdgeStyle;html=1;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" source="aTyR3iRUwYFkhW4yYsar-20" target="aTyR3iRUwYFkhW4yYsar-26" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-20" value="all_block_idx != 12?" style="rhombus;whiteSpace=wrap;html=1;strokeWidth=2;spacing=2;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" vertex="1">
+                    <mxGeometry x="380" y="740" width="140" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-24" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" source="aTyR3iRUwYFkhW4yYsar-22" target="aTyR3iRUwYFkhW4yYsar-16" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-22" value="添加目录项到目录第一个位置" style="whiteSpace=wrap;html=1;strokeWidth=2;spacing=2;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" vertex="1">
+                    <mxGeometry x="390" y="910" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-31" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" source="aTyR3iRUwYFkhW4yYsar-26" target="aTyR3iRUwYFkhW4yYsar-22" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="230" y="940"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-26" value="添加申请的blcok地址到all_blocks[12]" style="whiteSpace=wrap;html=1;strokeWidth=2;spacing=2;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" vertex="1">
+                    <mxGeometry x="170" y="750" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-30" style="edgeStyle=orthogonalEdgeStyle;html=1;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" source="aTyR3iRUwYFkhW4yYsar-28" target="aTyR3iRUwYFkhW4yYsar-20" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="aTyR3iRUwYFkhW4yYsar-28" value="添加申请的block到inode的sectors部分" style="whiteSpace=wrap;html=1;strokeWidth=2;spacing=2;fontStyle=1" parent="aTyR3iRUwYFkhW4yYsar-1" vertex="1">
+                    <mxGeometry x="390" y="620" width="120" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

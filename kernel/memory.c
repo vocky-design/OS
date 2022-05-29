@@ -3,7 +3,9 @@
 #include "interrupt.h"
 
 #define PG_SIZE                 4096
-#define MEM_BITMAP_BASE       0xc009a000  //1个物理块的PCB+4个物理块的位图
+/* 0xC009E00是内核主线程的PCB，一个页框大小的位图可表示128MB内存，
+位图安排在地址0xC009A00，这样本系统最大支持4个页框的位图，即最大支持512MB内存的管理。*/
+#define MEM_BITMAP_BASE       0xc009a000  
 #define K_HEAP_START          0xc0100000  //跨过低端1MB内存，其实后面还要跨过loader.S中定义的页目录表和页表占用的物理地址0x100000-0x101ff。
 
 #define PDE_IDX(addr)          ((addr & 0xffc00000) >> 22)
@@ -15,7 +17,7 @@ struct paddr_pool {
     struct lock lock;
     struct bitmap pool_bitmap;
     uint32_t paddr_start;
-    uint32_t pool_size;         //以页为基本单位  4KB
+    uint32_t pool_size;         //字节数
 };
 struct paddr_pool kernel_pool, user_pool;
 struct vaddr_pool kernel_vaddr_pool;
@@ -36,7 +38,7 @@ static void mem_pool_init(uint32_t all_mem)
     //从0开始，物理起始地址
     uint32_t kp_start = used_mem;
     uint32_t up_start = used_mem + kernel_free_pages * PG_SIZE;
-    //以页为基本单位  4KB
+    //池子字节数
     kernel_pool.pool_size = kernel_free_pages * PG_SIZE;
     user_pool.pool_size = user_free_pages * PG_SIZE;
 
@@ -88,7 +90,7 @@ void block_desc_init(struct mem_block_desc *desc_array)
 void mem_init(void) 
 {
     put_str("mem_init start\n");
-    uint32_t mem_bytes_total = (*(uint32_t *)0xb00);
+    uint32_t mem_bytes_total = (*(uint32_t *)0xb00);    
     mem_pool_init(mem_bytes_total);
     block_desc_init(k_block_descs);
     put_str("mem_init done\n");

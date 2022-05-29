@@ -10,6 +10,9 @@ typedef void thread_func(void *);
 struct list thread_ready_list;
 struct list thread_all_list;
 
+//进程最大打开文件数
+#define MAX_FILES_OPEN_PER_PROC 8
+
 /* 进程或线程的状态 */
 enum task_status {
     TASK_RUNNING,
@@ -71,6 +74,7 @@ struct task_struct {
     uint32_t *pgdir;                        //进程自己页目录表的虚拟地址
     struct vaddr_pool userprog_vaddr_pool;  //每个用户进程单独管理一个虚拟内存池
     struct mem_block_desc u_block_descs[DESC_CNT];
+    int32_t fd_table[MAX_FILES_OPEN_PER_PROC];//初始化为0、1、2、-1、-1、-1.......
     
     struct list_elem general_tag;
     struct list_elem all_list_tag;

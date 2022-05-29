@@ -11,4 +11,6 @@ char *strcpy(char *dst, const char *src);
 uint32_t strlen(const char *str);
 int8_t strcmp(const char *a, const char *b);
 char *strchr(const char *str, const char ch);
+char *strcat(char *dst_, const char *src_);
+char *strrchr(const char *str, const uint8_t ch);
 #endif

@@ -5,12 +5,15 @@ void  panic_spin(const char *filename, int line, const char *func, const char *c
 {
     intr_disable();          //关中断
 
-    put_str("\n\n\n!!! error !!!\n\n\n");
-    put_str("filename:");put_str(filename);put_char('\n');
-    put_str("line:0x");put_int(line);put_char('\n');
-    put_str("function:");put_str(func);put_char('\n');
-    put_str("condition:");put_str(condition);put_char('\n');
+    printk("\n\n\n!!! error !!!\n\n\n");
+    char *pure_filename = strrchr(filename, '/') + 1;
+    printk("filename: %s\n", pure_filename);
+    printk("line: 0x%d\n", line);
+    printk("function: %s\n", func);
+    printk("condition: %s\n", condition);
 
+    //悬停
     while(1);
-    
 }
+
+

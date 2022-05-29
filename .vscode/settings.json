@@ -11,7 +11,16 @@
         "cstdint": "c",
         "timer.h": "c",
         "typeinfo": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "super_block.h": "c",
+        "fs.h": "c",
+        "inode.h": "c",
+        "file.h": "c",
+        "dir.h": "c",
+        "ide.h": "c",
+        "sync.h": "c",
+        "io.h": "c",
+        "init.h": "c"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }

@@ -1,5 +1,7 @@
 #include "ide.h"
 
+
+
 /* 硬盘各寄存器的端口号 */
 #define reg_data(channel)           (channel->port_base + 0)
 #define reg_error(channel)          (channel->port_base + 1)
@@ -52,12 +54,11 @@ struct boot_sector {
     uint16_t signature;             //结束标志0x55,0xaa
 }__attribute__((packed));
 
-uint8_t channel_cnt;
-struct ide_channel channels[2];
+
 
 uint32_t ext_lba_base = 0;      //用于记录总扩展分区的起始lba
 uint8_t p_no = 0 , l_no = 0;
-struct list partition_list;     
+
 
 /* 选择读写的硬盘 */
 static void select_disk(struct disk *hd)
@@ -212,10 +213,8 @@ static void identify_disk(struct disk *hd)
     char info[512];             //承载硬盘参数信息
     select_disk(hd);
     cmd_out(hd->my_channel, CMD_IDENTIFY);
-    PRINTK_DEBUG("sema_down\n");
     //向硬盘发送指令后便通过信号量阻塞自己
     sema_down(&hd->my_channel->disk_done);
-    PRINTK_DEBUG("sema_up\n");
     //醒来后执行下面代码
     if(!busy_wait(hd)) {
             char error[64];
@@ -223,12 +222,10 @@ static void identify_disk(struct disk *hd)
             PANIC(error);
     }
     read_sector(hd, info, 1);
-    PRINTK_DEBUG("read_sector finished!");
     char buf[64];
     uint8_t sn_start = 10 * 2, sn_size = 20;
     uint8_t md_start = 27 * 2, md_size = 40;
     swap_pairs_bytes(&info[sn_start], buf, sn_size);
-    PRINTK_DEBUG("swap_pairs_bytes finished!\n");
     printk("disk %s info:\n", hd->name);
     printk("    SERIAL NUMBER: %s\n", buf);
     memset(buf, 0, 64);
@@ -265,14 +262,14 @@ static void partition_scan(struct disk *hd, uint32_t ext_lba)
                 ++p_no;
                 ASSERT(p_no < 4);
             } else {                    //是扩展分区
-                sprintf(hd->logic_parts[l_no].name, "%s%d", hd->name, 4+l_no);
+                sprintf(hd->logic_parts[l_no].name, "%s%d", hd->name, l_no+4+1);
                 hd->logic_parts[l_no].start_lba = ext_lba + p->offset_lba;
                 hd->logic_parts[l_no].sec_cnt = p->sec_cnt;
                 hd->logic_parts[l_no].my_disk = hd;
                 list_append(&partition_list, &hd->logic_parts[l_no].part_tag);
                 ++l_no;
                 ASSERT(l_no < 8);
-                if(l_no >= 8) {//只支持8个分区
+                if(l_no >= 8) {//只支持8个扩展分区
                     return;
                 }             
             }
@@ -351,7 +348,7 @@ void ide_init(void)
         while(disk_no < 2) {
             struct disk *hd = &channel->device[disk_no];
             sprintf(hd->name, "hd%c", 'a' + channel_no * 2 + disk_no);
-            PRINTK_DEBUG("channel_no:%d disk_no:%d", channel_no, disk_no);
+            //PRINTK_DEBUG("channel_no:%d disk_no:%d\n", channel_no, disk_no);
             hd->my_channel = channel;
             hd->dev_no = disk_no;
 

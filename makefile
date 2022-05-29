@@ -4,15 +4,17 @@ LD = ld
 BUILD_DIR = ./build
 BOCHS_DIR = ./bochs
 ENTRY_POINT = 0xc0001500
-LIB = -I lib/ -I lib/kernel/ -I lib/usr/ -I kernel/ -I kernel/thread/ -I kernel/device/ -I kernel/userprog/
+LIB = -I lib/ -I lib/kernel/ -I lib/usr/ \
+	  -I kernel/ -I kernel/thread/ -I kernel/device/ -I kernel/userprog/ -I kernel/fs/
 ASFLAGS = -f elf32
-CFLAGS  = -g -m32 $(LIB) -fno-builtin -fno-stack-protector -Wall -Wstrict-prototypes -Wmissing-prototypes -c
+CFLAGS  = -g -m32 $(LIB) -fno-builtin -fno-stack-protector -Wall -Wno-discarded-qualifiers -Wstrict-prototypes -Wmissing-prototypes -c
 LDFLAGS = -m elf_i386 -Ttext $(ENTRY_POINT) -e main
 OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/init.o $(BUILD_DIR)/interrupt.o $(BUILD_DIR)/timer.o \
 	$(BUILD_DIR)/kernel.o $(BUILD_DIR)/print.o $(BUILD_DIR)/debug.o $(BUILD_DIR)/string.o $(BUILD_DIR)/bitmap.o \
 	$(BUILD_DIR)/memory.o $(BUILD_DIR)/thread.o $(BUILD_DIR)/list.o $(BUILD_DIR)/switch.o $(BUILD_DIR)/sync.o   \
 	$(BUILD_DIR)/console.o $(BUILD_DIR)/keyboard.o $(BUILD_DIR)/ioqueue.o $(BUILD_DIR)/tss.o $(BUILD_DIR)/process.o \
- 	$(BUILD_DIR)/syscall-init.o $(BUILD_DIR)/syscall.o $(BUILD_DIR)/stdio.h $(BUILD_DIR)/ide.o
+ 	$(BUILD_DIR)/syscall-init.o $(BUILD_DIR)/syscall.o $(BUILD_DIR)/stdio.h  $(BUILD_DIR)/fs.o $(BUILD_DIR)/dir.o \
+	 $(BUILD_DIR)/inode.o $(BUILD_DIR)/file.o $(BUILD_DIR)/ide.o
 
 ####################### C编译 #######################################
 ##KERNEL##
@@ -22,7 +24,7 @@ kernel/memory.h kernel/thread/thread.h kernel/userprog/process.h
 
 $(BUILD_DIR)/init.o: kernel/init.c lib/kernel/print.h kernel/interrupt.h kernel/timer.h kernel/memory.h \
 kernel/thread/thread.h kernel/device/console.h kernel/device/keyboard.h kernel/userprog/tss.h \
-kernel/device/ide.h
+kernel/device/ide.h kernel/fs/fs.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(BUILD_DIR)/interrupt.o: kernel/interrupt.c kernel/global.h lib/kernel/io.h 
@@ -75,8 +77,20 @@ $(BUILD_DIR)/syscall-init.o: kernel/userprog/syscall-init.c kernel/global.h kern
 lib/usr/syscall.h
 	$(CC) $(CFLAGS) -o $@ $<
 
+##KERNEL/FS##
+$(BUILD_DIR)/fs.o: kernel/fs/fs.c kernel/device/ide.h kernel/fs/dir.h kernel/fs/inode.h \
+kernel/fs/super_block.h
+	$(CC) $(CFLAGS) -o $@ $<
+$(BUILD_DIR)/inode.o: kernel/fs/inode.c kernel/fs/fs.h kernel/device/ide.h kernel/fs/dir.h \
+kernel/fs/super_block.h
+	$(CC) $(CFLAGS) -o $@ $<
+$(BUILD_DIR)/file.o: kernel/fs/file.c lib/kernel/stdint.h kernel/thread/thread.h \
+kernel/fs/inode.h lib/kernel/bitmap.h kernel/device/ide.h
+	$(CC) $(CFLAGS) -o $@ $<
+$(BUILD_DIR)/dir.o: kernel/fs/dir.c kernel/global.h kernel/fs/fs.h kernel/device/ide.h
+	$(CC) $(CFLAGS) -o $@ $<
 ##LIB##
-$(BUILD_DIR)/bitmap.o: lib/kernel/bitmap.c kernel/global.h
+$(BUILD_DIR)/bitmap.o: lib/kernel/bitmap.c kernel/global.h 
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(BUILD_DIR)/list.o: lib/kernel/list.c kernel/interrupt.h lib/kernel/stdint.h

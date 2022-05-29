@@ -39,10 +39,13 @@ static uint32_t vsprintf(char *str, const char *format, va_list ap)
         } else {
             ++format;           //跳过'%'
             switch(*format) {
-                case 'x':
-                    arg_uint= va_arg(ap, uint32_t);
-                    itoa(arg_uint, &str, 16);
-                    ++format;
+                case 'c':
+                    *str++ = va_arg(ap, char);
+                    break;
+                case 's':
+                    arg_str = va_arg(ap, char *);
+                    strcpy(str, arg_str);
+                    str += strlen(arg_str)-1;
                     break;
                 case 'd':
                     arg_int = va_arg(ap, int);
@@ -51,22 +54,18 @@ static uint32_t vsprintf(char *str, const char *format, va_list ap)
                         *str++ = '-';
                     }
                     itoa(arg_int, &str, 10);
-                    ++format;
                     break;
-                case 's':
-                    arg_str = va_arg(ap, char *);
-                    strcpy(str, arg_str);
-                    str += strlen(arg_str);
-                    ++format;
-                    break;
-                case 'c':
-                    *str++ = va_arg(ap, char);
-                    ++format;
+                case 'x':
+                    strcpy(str, "0x");
+                    str += 2;
+                    arg_uint= va_arg(ap, uint32_t);
+                    itoa(arg_uint, &str, 16);    
                     break;
                 default:
                     PANIC("% of format must be one of x,d,s,c");
                     break;
             }
+            ++format;   //跳过格式字符
         }
     }
 
@@ -81,7 +80,7 @@ uint32_t printf(const char *format, ...)
     char buf[1024] = {0};
     vsprintf(buf, format, ap);
     va_end(ap);
-    return write(buf);
+    return write(1, buf, strlen(buf));
 }
 
 /* 同printf不同的地方就是字符串不是写到终端，而是写到buf中 */
@@ -94,7 +93,7 @@ uint32_t sprintf(char *buf, const char *format, ...)
     return retval;
 }
 
-/* 与printf的区别是不使用write系统调用 */
+/* printk：与printf的区别是不使用write系统调用 */
 uint32_t printk(const char *format, ...)
 {
     va_list ap;
